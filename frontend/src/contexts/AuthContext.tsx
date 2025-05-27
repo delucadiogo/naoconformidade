@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '@/lib/api';
+import { authService } from '@/services/api';
 import { toast } from 'sonner';
 import { User } from '@/utils/permissions';
 

@@ -23,11 +23,11 @@ services:
       - "3001:3001"
     environment:
       - NODE_ENV=production
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=Xinxuan99
-      - DB_NAME=nao_conformidades
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Xinxuan99
+      - POSTGRES_DB=nao_conformidades
       - JWT_SECRET=dsa6f49a4ewf161vaFeag8
       - UPLOAD_FOLDER=uploads
       - PORT=3001
