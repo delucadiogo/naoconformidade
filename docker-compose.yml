@@ -13,9 +13,8 @@ services:
       - app-network
 
   backend:
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+    build:
+      context: https://github.com/delucadiogo/naoconformidade.git#main:backend
     ports:
       - "3000:3000"
     environment:
@@ -27,11 +26,14 @@ services:
       - DB_NAME=nao_conformidades
       - JWT_SECRET=seu_jwt_secret_seguro
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    command: ["/bin/sh", "-c", "/app/scripts/run-migrations.sh && npm start"]
     volumes:
       - uploads:/app/uploads
     networks:
       - app-network
+    restart: always
 
   postgres:
     image: postgres:17-alpine
@@ -43,6 +45,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
 
 volumes:
   postgres_data:
