@@ -2,33 +2,38 @@ version: '3.8'
 
 services:
   frontend:
+    image: frontend:latest
     build: 
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: https://github.com/delucadiogo/naoconformidade.git#main:frontend
     ports:
-      - "80:80"
+      - "8060:80"
+    environment:
+      - VITE_API_URL=http://backend:3001/api
     depends_on:
       - backend
     networks:
       - app-network
+    restart: always
 
   backend:
+    image: backend:latest
     build:
       context: https://github.com/delucadiogo/naoconformidade.git#main:backend
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
       - NODE_ENV=production
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=sua_senha_segura
+      - DB_PASSWORD=Xinxuan99
       - DB_NAME=nao_conformidades
-      - JWT_SECRET=seu_jwt_secret_seguro
+      - JWT_SECRET=dsa6f49a4ewf161vaFeag8
+      - UPLOAD_FOLDER=uploads
+      - PORT=3001
     depends_on:
       postgres:
         condition: service_healthy
-    command: ["/bin/sh", "-c", "/app/scripts/run-migrations.sh && npm start"]
     volumes:
       - uploads:/app/uploads
     networks:
@@ -39,8 +44,10 @@ services:
     image: postgres:17-alpine
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=sua_senha_segura
+      - POSTGRES_PASSWORD=Xinxuan99
       - POSTGRES_DB=nao_conformidades
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
