@@ -1,12 +1,16 @@
 # Build stage
 FROM node:18-alpine as build
 
+# Adicionar ferramentas necessárias
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # Copiar package.json e package-lock.json
 COPY package*.json ./
 
-# Instalar dependências com mais verbosidade
+# Limpar cache do npm e instalar dependências com mais verbosidade
+RUN npm cache clean --force
 RUN npm install --legacy-peer-deps --verbose
 
 # Copiar resto dos arquivos
@@ -15,11 +19,14 @@ COPY . .
 # Criar arquivo .env
 RUN echo "VITE_API_URL=http://backend:3001/api" > .env
 
-# Mostrar conteúdo do diretório para debug
+# Mostrar conteúdo do diretório e ambiente para debug
 RUN ls -la
+RUN npm list || true
+RUN node -v
+RUN npm -v
 
-# Tentar build com mais informações de erro
-RUN npm run build || (echo "Build failed" && npm run build --verbose && exit 1)
+# Build com mais informações de debug
+RUN NODE_ENV=production npm run build --verbose
 
 # Production stage
 FROM nginx:alpine

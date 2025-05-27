@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   frontend:
-    image: frontend:latest
     build: 
       context: https://github.com/delucadiogo/naoconformidade.git#main:frontend
     ports:
@@ -16,7 +15,6 @@ services:
     restart: always
 
   backend:
-    image: backend:latest
     build:
       context: https://github.com/delucadiogo/naoconformidade.git#main:backend
     ports:
