@@ -4,9 +4,10 @@ const api = axios.create({
   baseURL: 'http://192.168.2.175:3001',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
   },
-  withCredentials: true
+  timeout: 10000
 });
 
 // Interceptor para adicionar o token de autenticação
@@ -16,6 +17,9 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
+}, (error) => {
+  console.error('Erro na configuração da requisição:', error);
+  return Promise.reject(error);
 });
 
 // Interceptor para lidar com erros
@@ -23,6 +27,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     console.error('Erro na requisição:', error);
+    if (error.response) {
+      console.error('Resposta do servidor:', error.response.data);
+      console.error('Status:', error.response.status);
+    } else if (error.request) {
+      console.error('Sem resposta do servidor:', error.request);
+    } else {
+      console.error('Erro na configuração da requisição:', error.message);
+    }
+    
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -43,8 +56,13 @@ const setFormDataConfig = (config: AxiosRequestConfig = {}): AxiosRequestConfig 
 
 export const authService = {
   login: async (email: string, senha: string) => {
-    const response = await api.post('/api/auth/login', { email, senha });
-    return response.data;
+    try {
+      const response = await api.post('/api/auth/login', { email, senha });
+      return response.data;
+    } catch (error) {
+      console.error('Erro no login:', error);
+      throw error;
+    }
   }
 };
 
