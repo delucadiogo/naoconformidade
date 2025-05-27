@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-// Configuração base do axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'http://localhost:3000/api'
 });
 
 // Interceptor para adicionar o token em todas as requisições
@@ -17,16 +13,45 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para tratamento de erros
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
+// Serviços de autenticação
+export const authService = {
+  async login(email: string, password: string) {
+    const response = await api.post('/usuarios/login', { email, senha: password });
+    return response.data;
+  },
+
+  async register(name: string, email: string, password: string) {
+    const response = await api.post('/usuarios/registrar', { nome: name, email, senha: password });
+    return response.data;
   }
-);
+};
+
+// Serviços de não conformidades
+export const nonConformityService = {
+  async create(data: FormData) {
+    const response = await api.post('/nao-conformidades', data);
+    return response.data;
+  },
+
+  async list() {
+    const response = await api.get('/nao-conformidades');
+    return response.data;
+  },
+
+  async getById(id: string) {
+    const response = await api.get(`/nao-conformidades/${id}`);
+    return response.data;
+  },
+
+  async update(id: string, data: FormData) {
+    const response = await api.put(`/nao-conformidades/${id}`, data);
+    return response.data;
+  },
+
+  async delete(id: string) {
+    const response = await api.delete(`/nao-conformidades/${id}`);
+    return response.data;
+  }
+};
 
 export default api; 

@@ -26,7 +26,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=Xinxuan99
       - POSTGRES_DB=nao_conformidades
-      - JWT_SECRET=dsa6f49a4ewf161vaFeag8
+      - JWT_SECRET=SDAFsadFdsfDSFefGth5849846ggseGfgh
       - UPLOAD_FOLDER=uploads
       - PORT=3001
     depends_on:
