@@ -6,11 +6,14 @@ WORKDIR /app
 # Copiar arquivos de dependências
 COPY package*.json ./
 
-# Instalar dependências
-RUN npm install
+# Instalar dependências com flags para evitar problemas
+RUN npm install --legacy-peer-deps
 
 # Copiar código fonte
 COPY . .
+
+# Criar arquivo .env se não existir
+RUN echo "VITE_API_URL=http://backend:3001/api" > .env
 
 # Criar build de produção
 RUN npm run build
