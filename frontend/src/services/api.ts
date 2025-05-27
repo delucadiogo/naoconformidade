@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import axiosRetry from 'axios-retry';
 
 const api = axios.create({
   baseURL: 'http://192.168.2.175:3001',
@@ -7,7 +8,20 @@ const api = axios.create({
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
   },
-  timeout: 10000
+  timeout: 30000 // aumentando para 30 segundos
+});
+
+// Configuração de retry
+axiosRetry(api, { 
+  retries: 3,
+  retryDelay: (retryCount) => {
+    return retryCount * 1000; // espera 1s, 2s, 3s entre as tentativas
+  },
+  retryCondition: (error) => {
+    // Retry em erros de rede ou timeout
+    return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+           error.code === 'ECONNABORTED';
+  }
 });
 
 // Interceptor para adicionar o token de autenticação
@@ -47,6 +61,8 @@ api.interceptors.response.use(
       console.error('Headers:', error.response.headers);
     } else if (error.request) {
       console.error('Sem resposta do servidor:', error.request);
+      console.error('URL tentada:', error.config.url);
+      console.error('Método:', error.config.method);
     } else {
       console.error('Erro na configuração da requisição:', error.message);
     }
