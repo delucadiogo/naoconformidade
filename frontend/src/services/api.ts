@@ -12,6 +12,13 @@ const api = axios.create({
 
 // Interceptor para adicionar o token de autenticação
 api.interceptors.request.use((config) => {
+  console.log('Configuração da requisição:', {
+    url: config.url,
+    method: config.method,
+    headers: config.headers,
+    data: config.data
+  });
+  
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -24,12 +31,20 @@ api.interceptors.request.use((config) => {
 
 // Interceptor para lidar com erros
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Resposta recebida:', {
+      status: response.status,
+      data: response.data,
+      headers: response.headers
+    });
+    return response;
+  },
   (error) => {
     console.error('Erro na requisição:', error);
     if (error.response) {
       console.error('Resposta do servidor:', error.response.data);
       console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
     } else if (error.request) {
       console.error('Sem resposta do servidor:', error.request);
     } else {
@@ -57,7 +72,9 @@ const setFormDataConfig = (config: AxiosRequestConfig = {}): AxiosRequestConfig 
 export const authService = {
   login: async (email: string, senha: string) => {
     try {
+      console.log('Tentando fazer login com:', { email });
       const response = await api.post('/api/auth/login', { email, senha });
+      console.log('Resposta do login:', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro no login:', error);
