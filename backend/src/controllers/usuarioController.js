@@ -7,10 +7,47 @@ const pool = require('../config/database');
  */
 const usuarioController = {
   /**
-   * Registra um novo usuário
+   * Lista todos os usuários
    */
-  async registrar(req, res) {
-    const { nome, email, senha } = req.body;
+  async listar(req, res) {
+    try {
+      const resultado = await pool.query(
+        'SELECT id, nome, email, funcao, departamento, ativo FROM usuarios ORDER BY nome'
+      );
+      res.json(resultado.rows);
+    } catch (error) {
+      console.error('Erro ao listar usuários:', error);
+      res.status(500).json({ mensagem: 'Erro ao listar usuários' });
+    }
+  },
+
+  /**
+   * Busca um usuário pelo ID
+   */
+  async buscarPorId(req, res) {
+    const { id } = req.params;
+    try {
+      const resultado = await pool.query(
+        'SELECT id, nome, email, funcao, departamento, ativo FROM usuarios WHERE id = $1',
+        [id]
+      );
+
+      if (resultado.rows.length === 0) {
+        return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+      }
+
+      res.json(resultado.rows[0]);
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+      res.status(500).json({ mensagem: 'Erro ao buscar usuário' });
+    }
+  },
+
+  /**
+   * Cria um novo usuário
+   */
+  async criar(req, res) {
+    const { nome, email, senha, funcao, departamento } = req.body;
 
     try {
       // Verifica se o usuário já existe
@@ -28,16 +65,75 @@ const usuarioController = {
       const senhaHash = await bcrypt.hash(senha, salt);
 
       // Insere o novo usuário
-      const novoUsuario = await pool.query(
-        'INSERT INTO usuarios (nome, email, senha_hash) VALUES ($1, $2, $3) RETURNING id, nome, email',
-        [nome, email, senhaHash]
+      const resultado = await pool.query(
+        'INSERT INTO usuarios (nome, email, senha_hash, funcao, departamento, ativo) VALUES ($1, $2, $3, $4, $5, true) RETURNING id, nome, email, funcao, departamento, ativo',
+        [nome, email, senhaHash, funcao, departamento]
       );
 
-      console.log('Usuário registrado com sucesso:', novoUsuario.rows[0]);
-      res.status(201).json(novoUsuario.rows[0]);
+      res.status(201).json(resultado.rows[0]);
     } catch (error) {
-      console.error('Erro ao registrar usuário:', error);
-      res.status(500).json({ mensagem: 'Erro ao registrar usuário' });
+      console.error('Erro ao criar usuário:', error);
+      res.status(500).json({ mensagem: 'Erro ao criar usuário' });
+    }
+  },
+
+  /**
+   * Atualiza um usuário existente
+   */
+  async atualizar(req, res) {
+    const { id } = req.params;
+    const { nome, email, senha, funcao, departamento, ativo } = req.body;
+
+    try {
+      let query = 'UPDATE usuarios SET nome = $1, email = $2, funcao = $3, departamento = $4, ativo = $5';
+      let params = [nome, email, funcao, departamento, ativo];
+      let paramCount = 5;
+
+      // Se uma nova senha foi fornecida, atualiza a senha
+      if (senha) {
+        const salt = await bcrypt.genSalt(10);
+        const senhaHash = await bcrypt.hash(senha, salt);
+        query += `, senha_hash = $${paramCount + 1}`;
+        params.push(senhaHash);
+        paramCount++;
+      }
+
+      query += ` WHERE id = $${paramCount + 1} RETURNING id, nome, email, funcao, departamento, ativo`;
+      params.push(id);
+
+      const resultado = await pool.query(query, params);
+
+      if (resultado.rows.length === 0) {
+        return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+      }
+
+      res.json(resultado.rows[0]);
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      res.status(500).json({ mensagem: 'Erro ao atualizar usuário' });
+    }
+  },
+
+  /**
+   * Remove um usuário
+   */
+  async deletar(req, res) {
+    const { id } = req.params;
+
+    try {
+      const resultado = await pool.query(
+        'DELETE FROM usuarios WHERE id = $1 RETURNING id',
+        [id]
+      );
+
+      if (resultado.rows.length === 0) {
+        return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+      }
+
+      res.json({ mensagem: 'Usuário removido com sucesso' });
+    } catch (error) {
+      console.error('Erro ao deletar usuário:', error);
+      res.status(500).json({ mensagem: 'Erro ao deletar usuário' });
     }
   },
 
@@ -93,7 +189,8 @@ const usuarioController = {
           id: usuario.id,
           nome: usuario.nome,
           email: usuario.email,
-          funcao: usuario.funcao
+          funcao: usuario.funcao,
+          departamento: usuario.departamento
         }
       });
     } catch (error) {

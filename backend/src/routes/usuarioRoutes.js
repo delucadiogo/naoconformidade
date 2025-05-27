@@ -6,10 +6,10 @@ const usuarioController = require('../controllers/usuarioController');
 router.post('/auth/login', usuarioController.login);
 
 // Rotas de usuários
-router.get('/usuarios', usuarioController.index);
-router.get('/usuarios/:id', usuarioController.show);
-router.post('/usuarios', usuarioController.create);
-router.put('/usuarios/:id', usuarioController.update);
-router.delete('/usuarios/:id', usuarioController.delete);
+router.get('/usuarios', usuarioController.listar);
+router.get('/usuarios/:id', usuarioController.buscarPorId);
+router.post('/usuarios', usuarioController.criar);
+router.put('/usuarios/:id', usuarioController.atualizar);
+router.delete('/usuarios/:id', usuarioController.deletar);
 
 module.exports = router; 
