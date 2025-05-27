@@ -3,32 +3,35 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Copiar arquivos de dependências
+# Copiar package.json e package-lock.json
 COPY package*.json ./
 
-# Instalar dependências com flags para evitar problemas
-RUN npm install --legacy-peer-deps
+# Instalar dependências com mais verbosidade
+RUN npm install --legacy-peer-deps --verbose
 
-# Copiar código fonte
+# Copiar resto dos arquivos
 COPY . .
 
-# Criar arquivo .env se não existir
+# Criar arquivo .env
 RUN echo "VITE_API_URL=http://backend:3001/api" > .env
 
-# Criar build de produção
-RUN npm run build
+# Mostrar conteúdo do diretório para debug
+RUN ls -la
+
+# Tentar build com mais informações de erro
+RUN npm run build || (echo "Build failed" && npm run build --verbose && exit 1)
 
 # Production stage
 FROM nginx:alpine
 
-# Copiar build do React para o diretório do Nginx
+# Copiar build do React
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiar configuração personalizada do Nginx
+# Copiar configuração do Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expor porta 80
 EXPOSE 80
 
-# Comando para iniciar o Nginx
+# Iniciar Nginx
 CMD ["nginx", "-g", "daemon off;"] 
