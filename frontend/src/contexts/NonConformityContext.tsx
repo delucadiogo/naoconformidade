@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { nonConformityService } from '@/lib/api';
+import { nonConformityService } from '@/services/api';
 import { toast } from 'sonner';
 
 export interface NonConformity {

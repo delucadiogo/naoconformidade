@@ -1,15 +1,19 @@
 const express = require('express');
-const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 
-// Rota de autenticação
-router.post('/auth/login', usuarioController.login);
+// Roteador de autenticação
+const authRouter = express.Router();
+authRouter.post('/login', usuarioController.login);
 
-// Rotas de usuários
-router.get('/', usuarioController.listar);
-router.get('/:id', usuarioController.buscarPorId);
-router.post('/', usuarioController.criar);
-router.put('/:id', usuarioController.atualizar);
-router.delete('/:id', usuarioController.deletar);
+// Roteador de usuários
+const usuarioRouter = express.Router();
+usuarioRouter.get('/', usuarioController.listar);
+usuarioRouter.get('/:id', usuarioController.buscarPorId);
+usuarioRouter.post('/', usuarioController.criar);
+usuarioRouter.put('/:id', usuarioController.atualizar);
+usuarioRouter.delete('/:id', usuarioController.deletar);
 
-module.exports = router; 
+module.exports = {
+  authRouter,
+  usuarioRouter
+}; 

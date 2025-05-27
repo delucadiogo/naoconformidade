@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const usuarioRoutes = require('./routes/usuarioRoutes');
+const { authRouter, usuarioRouter } = require('./routes/usuarioRoutes');
 const naoConformidadeRoutes = require('./routes/naoConformidadeRoutes');
 const configRoutes = require('./routes/configRoutes');
 
@@ -22,8 +22,8 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Rotas - todas sob /api
-app.use('/api/auth', usuarioRoutes); // Rotas de autenticação
-app.use('/api/usuarios', usuarioRoutes); // Rotas de usuários
+app.use('/api/auth', authRouter); // Rotas de autenticação
+app.use('/api/usuarios', usuarioRouter); // Rotas de usuários
 app.use('/api/nao-conformidades', naoConformidadeRoutes);
 app.use('/api/config', configRoutes);
 
