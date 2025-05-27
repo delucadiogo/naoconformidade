@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://192.168.2.175:3001/api',
+  baseURL: 'http://192.168.2.175:3001',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -22,6 +22,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('Erro na requisição:', error);
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -42,7 +43,7 @@ const setFormDataConfig = (config: AxiosRequestConfig = {}): AxiosRequestConfig 
 
 export const authService = {
   login: async (email: string, senha: string) => {
-    const response = await api.post('/usuarios/login', { email, senha });
+    const response = await api.post('/api/auth/login', { email, senha });
     return response.data;
   }
 };

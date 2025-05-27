@@ -12,7 +12,8 @@ app.use(cors({
   origin: ['http://192.168.2.175:8060', 'http://localhost:8060'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true
+  credentials: true,
+  exposedHeaders: ['Content-Length', 'Content-Range']
 }));
 
 app.use(express.json());
@@ -20,9 +21,8 @@ app.use(express.json());
 // Servir arquivos estáticos da pasta uploads
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-// Rotas
-app.use('/auth', usuarioRoutes); // Rota de autenticação
-app.use('/api/usuarios', usuarioRoutes);
+// Rotas - todas sob /api
+app.use('/api/auth', usuarioRoutes); // Rota de autenticação
 app.use('/api/nao-conformidades', naoConformidadeRoutes);
 app.use('/api/config', configRoutes);
 
