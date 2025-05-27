@@ -1,24 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '@/lib/api';
+import { authService } from '@/services/api';
 import { toast } from 'sonner';
 import { User } from '@/utils/permissions';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, senha: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,9 +27,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, senha: string): Promise<boolean> => {
     try {
-      const response = await authService.login(email, password);
+      console.log('Tentando fazer login com:', { email });
+      const response = await authService.login(email, senha);
       const { token, usuario } = response;
       
       console.log('Dados do usuário recebidos:', usuario);

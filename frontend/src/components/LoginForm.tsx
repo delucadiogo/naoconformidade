@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
@@ -18,13 +17,18 @@ const LoginForm = () => {
     setError('');
     setIsSubmitting(true);
 
-    const success = await login(email, password);
-    
-    if (!success) {
-      setError('Email ou senha incorretos');
+    try {
+      const success = await login(email, senha);
+      
+      if (!success) {
+        setError('Email ou senha incorretos');
+      }
+    } catch (error) {
+      console.error('Erro no formulário de login:', error);
+      setError('Erro ao tentar fazer login. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false);
   };
 
   return (
@@ -53,12 +57,12 @@ const LoginForm = () => {
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-slate-700">Senha</Label>
+              <Label htmlFor="senha" className="text-slate-700">Senha</Label>
               <Input
-                id="password"
+                id="senha"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
                 placeholder="••••••"
                 required
                 className="mt-1"
@@ -77,7 +81,7 @@ const LoginForm = () => {
               {isSubmitting ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
-          <div className="mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded">
+          <div className="mt-4 text-sm text-slate-600">
             <strong>Credenciais de teste:</strong><br />
             Email: admin@empresa.com<br />
             Senha: 123456
