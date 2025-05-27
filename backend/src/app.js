@@ -22,7 +22,7 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Rotas - todas sob /api
-app.use('/api/auth', usuarioRoutes); // Rota de autenticação
+app.use('/api', usuarioRoutes); // Inclui rotas de autenticação e usuários
 app.use('/api/nao-conformidades', naoConformidadeRoutes);
 app.use('/api/config', configRoutes);
 

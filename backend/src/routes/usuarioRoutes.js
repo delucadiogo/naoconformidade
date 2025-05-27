@@ -3,7 +3,7 @@ const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 
 // Rota de autenticação
-router.post('/auth/login', usuarioController.login);
+router.post('/login', usuarioController.login);
 
 // Rotas de usuários
 router.get('/usuarios', usuarioController.listar);
