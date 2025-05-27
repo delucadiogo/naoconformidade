@@ -1,7 +1,17 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
+// Determina a URL base da API baseado no ambiente
+const getBaseUrl = () => {
+  // Se estiver rodando em desenvolvimento (local)
+  if (import.meta.env.DEV) {
+    return 'http://localhost:3001/api';
+  }
+  // Se estiver rodando em produção (Docker)
+  return 'http://backend:3001/api';
+};
+
 const api = axios.create({
-  baseURL: 'http://backend:3001/api',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json'
   }
