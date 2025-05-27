@@ -7,7 +7,14 @@ const configRoutes = require('./routes/configRoutes');
 
 const app = express();
 
-app.use(cors());
+// Configuração mais específica do CORS
+app.use(cors({
+  origin: ['http://192.168.2.175:8060', 'http://localhost:8060'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Servir arquivos estáticos da pasta uploads
@@ -15,9 +22,9 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Rotas
 app.use('/auth', usuarioRoutes); // Rota de autenticação
-app.use('/usuarios', usuarioRoutes); // Rota de usuários
-app.use('/nao-conformidades', naoConformidadeRoutes);
-app.use('/config', configRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/nao-conformidades', naoConformidadeRoutes);
+app.use('/api/config', configRoutes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {

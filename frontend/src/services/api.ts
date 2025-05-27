@@ -3,8 +3,10 @@ import axios, { AxiosRequestConfig } from 'axios';
 const api = axios.create({
   baseURL: 'http://192.168.2.175:3001/api',
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  withCredentials: true
 });
 
 // Interceptor para adicionar o token de autenticação
@@ -40,7 +42,7 @@ const setFormDataConfig = (config: AxiosRequestConfig = {}): AxiosRequestConfig 
 
 export const authService = {
   login: async (email: string, senha: string) => {
-    const response = await api.post('/auth/login', { email, senha });
+    const response = await api.post('/usuarios/login', { email, senha });
     return response.data;
   }
 };
