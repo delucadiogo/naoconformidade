@@ -1,50 +1,27 @@
 import React, { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { nonConformityService } from '@/lib/api';
+import { nonConformityService, NonConformity, CreateNonConformityDTO, UpdateNonConformityDTO } from '@/services/nonConformityService';
 import { toast } from 'sonner';
-
-export interface NonConformity {
-  id: string;
-  data_lancamento: string;
-  nome_produto: string;
-  validade: string;
-  lote: string;
-  tipo_produto: string;
-  descricao: string;
-  fotos?: string[];
-  data_liberacao?: string;
-  acao_tomada: string;
-  criado_em: string;
-  criado_por_nome?: string;
-}
 
 interface NonConformityContextType {
   nonConformities: NonConformity[];
   isLoading: boolean;
   error: Error | null;
-  addNonConformity: (data: FormData) => Promise<void>;
-  updateNonConformity: (id: string, data: FormData) => Promise<void>;
-  deleteNonConformity: (id: string) => Promise<void>;
-  getNonConformity: (id: string) => NonConformity | undefined;
+  addNonConformity: (data: CreateNonConformityDTO) => Promise<void>;
+  updateNonConformity: (data: UpdateNonConformityDTO) => Promise<void>;
+  deleteNonConformity: (id: number) => Promise<void>;
+  getNonConformity: (id: number) => NonConformity | undefined;
 }
 
 const NonConformityContext = createContext<NonConformityContextType | undefined>(undefined);
 
-export const useNonConformity = () => {
-  const context = useContext(NonConformityContext);
-  if (context === undefined) {
-    throw new Error('useNonConformity must be used within a NonConformityProvider');
-  }
-  return context;
-};
-
-export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function NonConformityProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
   // Buscar todas as não conformidades
   const { data: nonConformities = [], isLoading, error } = useQuery({
     queryKey: ['nonConformities'],
-    queryFn: nonConformityService.list
+    queryFn: nonConformityService.getAll,
   });
 
   // Adicionar não conformidade
@@ -54,24 +31,21 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
       queryClient.invalidateQueries({ queryKey: ['nonConformities'] });
       toast.success('Não conformidade criada com sucesso!');
     },
-    onError: (error) => {
-      console.error('Erro ao criar não conformidade:', error);
-      toast.error('Erro ao criar não conformidade');
-    }
+    onError: (error: Error) => {
+      toast.error(`Erro ao criar não conformidade: ${error.message}`);
+    },
   });
 
   // Atualizar não conformidade
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) => 
-      nonConformityService.update(id, data),
+    mutationFn: nonConformityService.update,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nonConformities'] });
       toast.success('Não conformidade atualizada com sucesso!');
     },
-    onError: (error) => {
-      console.error('Erro ao atualizar não conformidade:', error);
-      toast.error('Erro ao atualizar não conformidade');
-    }
+    onError: (error: Error) => {
+      toast.error(`Erro ao atualizar não conformidade: ${error.message}`);
+    },
   });
 
   // Deletar não conformidade
@@ -79,28 +53,27 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
     mutationFn: nonConformityService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nonConformities'] });
-      toast.success('Não conformidade deletada com sucesso!');
+      toast.success('Não conformidade excluída com sucesso!');
     },
-    onError: (error) => {
-      console.error('Erro ao deletar não conformidade:', error);
-      toast.error('Erro ao deletar não conformidade');
-    }
+    onError: (error: Error) => {
+      toast.error(`Erro ao excluir não conformidade: ${error.message}`);
+    },
   });
 
-  const addNonConformity = async (data: FormData) => {
+  const addNonConformity = async (data: CreateNonConformityDTO) => {
     await addMutation.mutateAsync(data);
   };
 
-  const updateNonConformity = async (id: string, data: FormData) => {
-    await updateMutation.mutateAsync({ id, data });
+  const updateNonConformity = async (data: UpdateNonConformityDTO) => {
+    await updateMutation.mutateAsync(data);
   };
 
-  const deleteNonConformity = async (id: string) => {
+  const deleteNonConformity = async (id: number) => {
     await deleteMutation.mutateAsync(id);
   };
 
-  const getNonConformity = (id: string) => {
-    return nonConformities.find(nc => nc.id === id);
+  const getNonConformity = (id: number) => {
+    return nonConformities.find((nc) => nc.id === id);
   };
 
   const value = {
@@ -110,7 +83,7 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
     addNonConformity,
     updateNonConformity,
     deleteNonConformity,
-    getNonConformity
+    getNonConformity,
   };
 
   return (
@@ -118,4 +91,12 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </NonConformityContext.Provider>
   );
-};
+}
+
+export function useNonConformity() {
+  const context = useContext(NonConformityContext);
+  if (context === undefined) {
+    throw new Error('useNonConformity must be used within a NonConformityProvider');
+  }
+  return context;
+}
