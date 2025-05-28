@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const usuarioRoutes = require('./usuarioRoutes');
+const { authRouter, usuarioRouter } = require('./usuarioRoutes');
 const naoConformidadeRoutes = require('./naoConformidadeRoutes');
-const userRoutes = require('./userRoutes');
 const configRoutes = require('./configRoutes');
 
-router.use('/usuarios', usuarioRoutes);
+// Rotas de autenticação
+router.use('/auth', authRouter);
+
+// Rotas de recursos
+router.use('/usuarios', usuarioRouter);
 router.use('/nao-conformidades', naoConformidadeRoutes);
-router.use('/users', userRoutes);
 router.use('/config', configRoutes);
 
 module.exports = router; 

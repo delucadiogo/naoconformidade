@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const routes = require('./routes');
-const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -15,9 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos do diretório de uploads
 app.use('/uploads', express.static(path.join(__dirname, '..', process.env.UPLOAD_FOLDER)));
 
-// Rotas
+// Rotas - todas sob /api
 app.use('/api', routes);
-app.use('/api', userRoutes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {
