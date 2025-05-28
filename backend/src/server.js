@@ -15,9 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos do diretório de uploads
 app.use('/uploads', express.static(path.join(__dirname, '..', process.env.UPLOAD_FOLDER)));
 
-// Rotas - todas sob /api
-app.use('/api', routes);
-
 // Tratamento de erros
 app.use((err, req, res, next) => {
   console.error('Erro:', err.message);

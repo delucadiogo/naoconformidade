@@ -1,22 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { nonConformityService, CreateNonConformityDTO } from '@/services/nonConformityService';
+import { nonConformityService, CreateNonConformityDTO, NonConformity } from '@/services/nonConformityService';
 import { toast } from 'sonner';
-
-export interface NonConformity {
-  id: string;
-  data_lancamento: string;
-  nome_produto: string;
-  validade: string;
-  lote: string;
-  tipo_produto: string;
-  descricao: string;
-  fotos?: string[];
-  data_liberacao?: string;
-  acao_tomada: string;
-  criado_em: string;
-  criado_por_nome?: string;
-}
 
 interface NonConformityContextType {
   nonConformities: NonConformity[];
