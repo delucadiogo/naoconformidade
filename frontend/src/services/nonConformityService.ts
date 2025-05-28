@@ -1,19 +1,30 @@
 import api from '@/lib/api';
 
 export interface NonConformity {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  attachments?: string[];
+  id: string;
+  data_lancamento: string;
+  nome_produto: string;
+  validade: string;
+  lote: string;
+  tipo_produto: string;
+  descricao: string;
+  fotos?: string[];
+  data_liberacao?: string;
+  acao_tomada: string;
+  criado_em: string;
+  criado_por_nome?: string;
 }
 
 export interface CreateNonConformityDTO {
-  title: string;
-  description: string;
-  attachments?: File[];
+  data_lancamento: string;
+  nome_produto: string;
+  validade: string;
+  lote: string;
+  tipo_produto: string;
+  descricao: string;
+  data_liberacao?: string;
+  acao_tomada?: string;
+  fotos?: File[];
 }
 
 export interface UpdateNonConformityDTO {
@@ -26,27 +37,30 @@ export interface UpdateNonConformityDTO {
 
 export const nonConformityService = {
   getAll: async (): Promise<NonConformity[]> => {
-    const response = await api.get('/non-conformities');
+    const response = await api.get('/api/nao-conformidades');
     return response.data;
   },
 
-  getById: async (id: number): Promise<NonConformity> => {
-    const response = await api.get(`/non-conformities/${id}`);
+  getById: async (id: string): Promise<NonConformity> => {
+    const response = await api.get(`/api/nao-conformidades/${id}`);
     return response.data;
   },
 
   create: async (data: CreateNonConformityDTO): Promise<NonConformity> => {
     const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('description', data.description);
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && key !== 'fotos') {
+        formData.append(key, value);
+      }
+    });
     
-    if (data.attachments) {
-      data.attachments.forEach((file) => {
-        formData.append('attachments', file);
+    if (data.fotos) {
+      data.fotos.forEach((file) => {
+        formData.append('fotos', file);
       });
     }
 
-    const response = await api.post('/non-conformities', formData, {
+    const response = await api.post('/api/nao-conformidades', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -54,19 +68,21 @@ export const nonConformityService = {
     return response.data;
   },
 
-  update: async (data: UpdateNonConformityDTO): Promise<NonConformity> => {
+  update: async (id: string, data: Partial<CreateNonConformityDTO>): Promise<NonConformity> => {
     const formData = new FormData();
-    if (data.title) formData.append('title', data.title);
-    if (data.description) formData.append('description', data.description);
-    if (data.status) formData.append('status', data.status);
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && key !== 'fotos') {
+        formData.append(key, value);
+      }
+    });
     
-    if (data.attachments) {
-      data.attachments.forEach((file) => {
-        formData.append('attachments', file);
+    if (data.fotos) {
+      data.fotos.forEach((file) => {
+        formData.append('fotos', file);
       });
     }
 
-    const response = await api.put(`/non-conformities/${data.id}`, formData, {
+    const response = await api.put(`/api/nao-conformidades/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -74,7 +90,7 @@ export const nonConformityService = {
     return response.data;
   },
 
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/non-conformities/${id}`);
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/nao-conformidades/${id}`);
   },
 }; 

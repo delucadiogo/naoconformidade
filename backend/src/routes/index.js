@@ -7,9 +7,13 @@ const configRoutes = require('./configRoutes');
 // Rotas de autenticação
 router.use('/auth', authRouter);
 
-// Rotas de recursos
+// Rotas de usuários
 router.use('/usuarios', usuarioRouter);
+
+// Rotas de não conformidades
 router.use('/nao-conformidades', naoConformidadeRoutes);
+
+// Rotas de configuração
 router.use('/config', configRoutes);
 
 module.exports = router; 

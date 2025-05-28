@@ -28,6 +28,7 @@ import PhotoUpload from './PhotoUpload';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { CreateNonConformityDTO } from '@/services/nonConformityService';
 
 const formSchema = z.object({
   data_lancamento: z.string().min(1, 'Data de lançamento é obrigatória'),
@@ -46,6 +47,8 @@ interface NonConformityFormProps {
   onCancel: () => void;
 }
 
+type FormValues = z.infer<typeof formSchema>;
+
 const NonConformityForm: React.FC<NonConformityFormProps> = ({
   editingId,
   onSuccess,
@@ -53,14 +56,14 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const { addNonConformity, updateNonConformity, getNonConformity } = useNonConformity();
-  const { productTypes, actionTypes, loading: configLoading } = useConfig();
+  const { productTypes, actionTypes, loading } = useConfig();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      data_lancamento: format(new Date(), 'yyyy-MM-dd'),
+      data_lancamento: '',
       nome_produto: '',
       validade: '',
       lote: '',
@@ -76,38 +79,48 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
       const nonConformity = getNonConformity(editingId);
       if (nonConformity) {
         form.reset({
-          data_lancamento: format(new Date(nonConformity.data_lancamento), 'yyyy-MM-dd'),
+          data_lancamento: nonConformity.data_lancamento.split('T')[0],
           nome_produto: nonConformity.nome_produto,
-          validade: format(new Date(nonConformity.validade), 'yyyy-MM-dd'),
+          validade: nonConformity.validade.split('T')[0],
           lote: nonConformity.lote,
           tipo_produto: nonConformity.tipo_produto,
           descricao: nonConformity.descricao,
-          data_liberacao: nonConformity.data_liberacao ? format(new Date(nonConformity.data_liberacao), 'yyyy-MM-dd') : '',
+          data_liberacao: nonConformity.data_liberacao?.split('T')[0] || '',
           acao_tomada: nonConformity.acao_tomada || '',
         });
       }
     }
   }, [editingId, getNonConformity, form]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newPhotos = Array.from(files);
+      setPhotos(prevPhotos => [...prevPhotos, ...newPhotos]);
+    }
+  };
+
+  const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
       
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        if (value) formData.append(key, value);
-      });
-      
-      // Adiciona as fotos ao FormData
-      photos.forEach((photo) => {
-        formData.append('fotos', photo);
-      });
+      const data: CreateNonConformityDTO = {
+        data_lancamento: values.data_lancamento,
+        nome_produto: values.nome_produto,
+        validade: values.validade,
+        lote: values.lote,
+        tipo_produto: values.tipo_produto,
+        descricao: values.descricao,
+        data_liberacao: values.data_liberacao,
+        acao_tomada: values.acao_tomada,
+        fotos: photos
+      };
 
       if (editingId) {
-        await updateNonConformity(editingId, formData);
+        await updateNonConformity(editingId, data);
         toast.success('Não conformidade atualizada com sucesso!');
       } else {
-        await addNonConformity(formData);
+        await addNonConformity(data);
         toast.success('Não conformidade registrada com sucesso!');
       }
       
@@ -120,7 +133,7 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
     }
   };
 
-  if (configLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -205,7 +218,7 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo" />
+                        <SelectValue placeholder="Selecione o tipo de produto" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -230,7 +243,7 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione a ação" />
+                        <SelectValue placeholder="Selecione a ação tomada" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -268,7 +281,7 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
               <FormItem>
                 <FormLabel>Descrição</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  <Textarea {...field} rows={4} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -277,7 +290,13 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
 
           <div className="space-y-2">
             <FormLabel>Fotos</FormLabel>
-            <PhotoUpload photos={photos} onPhotosChange={setPhotos} />
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoChange}
+              className="mt-1"
+            />
           </div>
 
           <div className="flex justify-end space-x-4">
@@ -290,7 +309,14 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Salvando...' : editingId ? 'Atualizar' : 'Criar'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                'Salvar'
+              )}
             </Button>
           </div>
         </form>

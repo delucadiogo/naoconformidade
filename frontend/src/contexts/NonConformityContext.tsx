@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { nonConformityService } from '@/services/api';
+import { nonConformityService, CreateNonConformityDTO } from '@/services/nonConformityService';
 import { toast } from 'sonner';
 
 export interface NonConformity {
@@ -22,8 +22,8 @@ interface NonConformityContextType {
   nonConformities: NonConformity[];
   isLoading: boolean;
   error: Error | null;
-  addNonConformity: (data: FormData) => Promise<void>;
-  updateNonConformity: (id: string, data: FormData) => Promise<void>;
+  addNonConformity: (data: CreateNonConformityDTO) => Promise<void>;
+  updateNonConformity: (id: string, data: Partial<CreateNonConformityDTO>) => Promise<void>;
   deleteNonConformity: (id: string) => Promise<void>;
   getNonConformity: (id: string) => NonConformity | undefined;
 }
@@ -44,7 +44,7 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
   // Buscar todas as não conformidades
   const { data: nonConformities = [], isLoading, error } = useQuery({
     queryKey: ['nonConformities'],
-    queryFn: nonConformityService.list
+    queryFn: nonConformityService.getAll
   });
 
   // Adicionar não conformidade
@@ -62,7 +62,7 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Atualizar não conformidade
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateNonConformityDTO> }) => 
       nonConformityService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nonConformities'] });
@@ -87,11 +87,11 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   });
 
-  const addNonConformity = async (data: FormData) => {
+  const addNonConformity = async (data: CreateNonConformityDTO) => {
     await addMutation.mutateAsync(data);
   };
 
-  const updateNonConformity = async (id: string, data: FormData) => {
+  const updateNonConformity = async (id: string, data: Partial<CreateNonConformityDTO>) => {
     await updateMutation.mutateAsync({ id, data });
   };
 

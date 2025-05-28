@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { authRouter, usuarioRouter } = require('./routes/usuarioRoutes');
-const naoConformidadeRoutes = require('./routes/naoConformidadeRoutes');
-const configRoutes = require('./routes/configRoutes');
+const routes = require('./routes');
 
 const app = express();
 
@@ -18,14 +16,11 @@ app.use(cors({
 
 app.use(express.json());
 
-// Servir arquivos estáticos da pasta uploads
+// Configuração para servir arquivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Rotas - todas sob /api
-app.use('/api/auth', authRouter); // Rotas de autenticação
-app.use('/api/usuarios', usuarioRouter); // Rotas de usuários
-app.use('/api/nao-conformidades', naoConformidadeRoutes);
-app.use('/api/config', configRoutes);
+app.use('/api', routes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {
