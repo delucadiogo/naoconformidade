@@ -27,7 +27,7 @@ import {
 import PhotoUpload from './PhotoUpload';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { CreateNonConformityDTO } from '@/services/nonConformityService';
 
 const formSchema = z.object({
@@ -92,12 +92,8 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
     }
   }, [editingId, getNonConformity, form]);
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newPhotos = Array.from(files);
-      setPhotos(prevPhotos => [...prevPhotos, ...newPhotos]);
-    }
+  const handlePhotoChange = (newPhotos: File[]) => {
+    setPhotos(newPhotos);
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -290,13 +286,7 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
 
           <div className="space-y-2">
             <FormLabel>Fotos</FormLabel>
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handlePhotoChange}
-              className="mt-1"
-            />
+            <PhotoUpload onPhotosChange={handlePhotoChange} photos={photos} />
           </div>
 
           <div className="flex justify-end space-x-4">

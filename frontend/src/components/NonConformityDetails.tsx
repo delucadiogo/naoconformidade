@@ -37,8 +37,8 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
   };
 
   const getImageUrl = (filename: string) => {
-    // URL base padrão para o ambiente de desenvolvimento
-    const baseUrl = 'http://localhost:3000';
+    // URL base do backend
+    const baseUrl = 'http://192.168.2.175:3001';
     return `${baseUrl}/uploads/${filename}`;
   };
 

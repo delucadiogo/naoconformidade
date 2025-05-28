@@ -14,10 +14,12 @@ app.use(cors({
   exposedHeaders: ['Content-Length', 'Content-Range']
 }));
 
-app.use(express.json());
-
 // Configuração para servir arquivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+
+// Configuração do parser de JSON e URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Rotas - todas sob /api
 app.use('/api', routes);
