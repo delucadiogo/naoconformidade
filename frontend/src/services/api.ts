@@ -72,49 +72,49 @@ export const authService = {
 
 export const nonConformityService = {
   create: async (data: FormData) => {
-    const response = await api.post('/nao-conformidades', data, setFormDataConfig());
+    const response = await api.post('/api/nao-conformidades', data, setFormDataConfig());
     return response.data;
   },
 
   update: async (id: string, data: FormData) => {
-    const response = await api.put(`/nao-conformidades/${id}`, data, setFormDataConfig());
+    const response = await api.put(`/api/nao-conformidades/${id}`, data, setFormDataConfig());
     return response.data;
   },
 
   delete: async (id: string) => {
-    const response = await api.delete(`/nao-conformidades/${id}`);
+    const response = await api.delete(`/api/nao-conformidades/${id}`);
     return response.data;
   },
 
   getAll: async () => {
-    const response = await api.get('/nao-conformidades');
+    const response = await api.get('/api/nao-conformidades');
     return response.data;
   },
 
   getById: async (id: string) => {
-    const response = await api.get(`/nao-conformidades/${id}`);
+    const response = await api.get(`/api/nao-conformidades/${id}`);
     return response.data;
   }
 };
 
 export const userService = {
   create: async (data: any) => {
-    const response = await api.post('/usuarios', data);
+    const response = await api.post('/api/usuarios', data);
     return response.data;
   },
 
   update: async (id: string, data: any) => {
-    const response = await api.put(`/usuarios/${id}`, data);
+    const response = await api.put(`/api/usuarios/${id}`, data);
     return response.data;
   },
 
   delete: async (id: string) => {
-    const response = await api.delete(`/usuarios/${id}`);
+    const response = await api.delete(`/api/usuarios/${id}`);
     return response.data;
   },
 
   getAll: async () => {
-    const response = await api.get('/usuarios');
+    const response = await api.get('/api/usuarios');
     return response.data;
   }
 };
