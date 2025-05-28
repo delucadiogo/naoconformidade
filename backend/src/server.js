@@ -5,7 +5,7 @@ const path = require('path');
 const routes = require('./routes');
 const app = require('./app');
 
-const app = express();
+const PORT = process.env.PORT || 3001;
 
 // Middlewares
 app.use(cors());
@@ -24,8 +24,6 @@ app.use((err, req, res, next) => {
   console.error('Stack:', err.stack);
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
-
-const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
