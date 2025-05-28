@@ -24,7 +24,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=Xinxuan99
+      - POSTGRES_PASSWORD=SUASENHAAQUI
       - POSTGRES_DB=nao_conformidades
       - JWT_SECRET=SDAFsadFdsfDSFefGth5849846ggseGfgh
       - UPLOAD_FOLDER=uploads
@@ -42,7 +42,7 @@ services:
     image: postgres:17-alpine
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=Xinxuan99
+      - POSTGRES_PASSWORD=SUASENHAAQUI
       - POSTGRES_DB=nao_conformidades
     ports:
       - "5432:5432"
