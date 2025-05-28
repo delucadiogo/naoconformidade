@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ZoomIn } from 'lucide-react';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface NonConformityDetailsProps {
   nonConformity: {
@@ -17,9 +18,7 @@ interface NonConformityDetailsProps {
     validade: string;
     lote: string;
     tipo_produto: string;
-    tipo_produto_rotulo: string;
     acao_tomada: string;
-    acao_tomada_rotulo: string;
     criado_por_nome?: string;
     descricao?: string;
     fotos?: string[];
@@ -32,6 +31,7 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
   onClose,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { productTypes, actionTypes } = useConfig();
 
   const formatDate = (date: string) => {
     if (!date) return '';
@@ -42,6 +42,16 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
     // URL base do backend
     const baseUrl = 'http://192.168.2.175:3001';
     return `${baseUrl}/uploads/${filename}`;
+  };
+
+  const getProductTypeLabel = (value: string) => {
+    const type = productTypes.find(t => t.value === value);
+    return type ? type.label : value;
+  };
+
+  const getActionTypeLabel = (value: string) => {
+    const type = actionTypes.find(t => t.value === value);
+    return type ? type.label : value;
   };
 
   return (
@@ -75,12 +85,12 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
 
             <div>
               <h4 className="font-semibold">Tipo de Produto</h4>
-              <p>{nonConformity.tipo_produto_rotulo}</p>
+              <p>{getProductTypeLabel(nonConformity.tipo_produto)}</p>
             </div>
 
             <div>
               <h4 className="font-semibold">Ação Tomada</h4>
-              <p>{nonConformity.acao_tomada_rotulo || 'Não definida'}</p>
+              <p>{nonConformity.acao_tomada ? getActionTypeLabel(nonConformity.acao_tomada) : 'Não definida'}</p>
             </div>
 
             <div>

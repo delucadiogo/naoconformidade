@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useConfig } from '@/contexts/ConfigContext';
 import { canEditNonConformity, canDeleteNonConformity } from '@/utils/permissions';
 import NonConformityDetails from './NonConformityDetails';
 
@@ -15,9 +16,9 @@ interface NonConformity {
   validade: string;
   lote: string;
   tipo_produto: string;
-  tipo_produto_rotulo: string;
+  tipo_produto_rotulo?: string;
   acao_tomada: string;
-  acao_tomada_rotulo: string;
+  acao_tomada_rotulo?: string;
   criado_por_nome?: string;
   descricao?: string;
   fotos?: string[];
@@ -35,6 +36,7 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
   onDelete: handleDelete,
 }) => {
   const { user } = useAuth();
+  const { productTypes, actionTypes } = useConfig();
   const [selectedNonConformity, setSelectedNonConformity] = useState<NonConformity | null>(null);
 
   const formatDate = (dateString: string | null) => {
@@ -45,6 +47,16 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
       console.error('Erro ao formatar data:', error);
       return '-';
     }
+  };
+
+  const getProductTypeLabel = (value: string) => {
+    const type = productTypes.find(t => t.value === value);
+    return type ? type.label : value;
+  };
+
+  const getActionTypeLabel = (value: string) => {
+    const type = actionTypes.find(t => t.value === value);
+    return type ? type.label : value;
   };
 
   const handleView = (nc: NonConformity) => {
@@ -97,10 +109,10 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
                 </td>
                 <td className="px-4 py-3">{nc.lote}</td>
                 <td className="px-4 py-3">
-                  <Badge variant="secondary">{nc.tipo_produto_rotulo}</Badge>
+                  <Badge variant="secondary">{getProductTypeLabel(nc.tipo_produto)}</Badge>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant="secondary">{nc.acao_tomada_rotulo || 'Não definida'}</Badge>
+                  <Badge variant="secondary">{nc.acao_tomada ? getActionTypeLabel(nc.acao_tomada) : 'Não definida'}</Badge>
                 </td>
                 <td className="px-4 py-3">{nc.criado_por_nome}</td>
                 <td className="px-4 py-3">
