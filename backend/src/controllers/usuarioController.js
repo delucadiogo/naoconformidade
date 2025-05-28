@@ -82,9 +82,27 @@ const usuarioController = {
    */
   async atualizar(req, res) {
     const { id } = req.params;
-    const { nome, email, senha, funcao, departamento, ativo } = req.body;
+    // Mapeia os campos do frontend para o formato do backend
+    const { 
+      name: nome, 
+      email, 
+      password: senha, 
+      role: funcao, 
+      department: departamento, 
+      isActive: ativo 
+    } = req.body;
 
     try {
+      // Verifica se o usuário existe antes de tentar atualizar
+      const usuarioExiste = await pool.query(
+        'SELECT id FROM usuarios WHERE id = $1',
+        [id]
+      );
+
+      if (usuarioExiste.rows.length === 0) {
+        return res.status(404).json({ mensagem: 'Usuário não encontrado' });
+      }
+
       let query = 'UPDATE usuarios SET nome = $1, email = $2, funcao = $3, departamento = $4, ativo = $5';
       let params = [nome, email, funcao, departamento, ativo];
       let paramCount = 5;
