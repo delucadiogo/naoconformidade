@@ -15,7 +15,9 @@ interface NonConformity {
   validade: string;
   lote: string;
   tipo_produto: string;
+  tipo_produto_rotulo: string;
   acao_tomada: string;
+  acao_tomada_rotulo: string;
   criado_por_nome?: string;
   descricao?: string;
   fotos?: string[];
@@ -80,39 +82,34 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {nonConformities.map((nc) => (
-              <tr key={nc.id}>
-                <td className="px-4 py-3 text-slate-900">
+              <tr key={nc.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 whitespace-nowrap">
                   {formatDate(nc.data_lancamento)}
                 </td>
                 <td className="px-4 py-3">
                   <div>
-                    <div className="text-slate-900">{nc.nome_produto}</div>
-                    <div className="text-sm text-slate-500">
+                    <span className="font-medium">{nc.nome_produto}</span>
+                    <br />
+                    <span className="text-sm text-gray-500">
                       Validade: {formatDate(nc.validade)}
-                    </div>
+                    </span>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-slate-900">{nc.lote}</td>
+                <td className="px-4 py-3">{nc.lote}</td>
                 <td className="px-4 py-3">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    {nc.tipo_produto}
-                  </Badge>
+                  <Badge variant="secondary">{nc.tipo_produto_rotulo}</Badge>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant="secondary" className="bg-red-100 text-red-800">
-                    {nc.acao_tomada}
-                  </Badge>
+                  <Badge variant="secondary">{nc.acao_tomada_rotulo || 'Não definida'}</Badge>
                 </td>
-                <td className="px-4 py-3 text-slate-900">
-                  {nc.criado_por_nome || '-'}
-                </td>
+                <td className="px-4 py-3">{nc.criado_por_nome}</td>
                 <td className="px-4 py-3">
-                  <div className="flex space-x-2">
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleView(nc)}
-                      className="text-blue-600 hover:text-blue-800"
+                      title="Visualizar"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -121,7 +118,7 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
                         variant="ghost"
                         size="icon"
                         onClick={() => onEdit(nc.id)}
-                        className="text-amber-600 hover:text-amber-800"
+                        title="Editar"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -131,7 +128,7 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDelete(nc.id)}
-                        className="text-red-600 hover:text-red-800"
+                        title="Excluir"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

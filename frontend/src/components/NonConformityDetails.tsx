@@ -17,7 +17,9 @@ interface NonConformityDetailsProps {
     validade: string;
     lote: string;
     tipo_produto: string;
+    tipo_produto_rotulo: string;
     acao_tomada: string;
+    acao_tomada_rotulo: string;
     criado_por_nome?: string;
     descricao?: string;
     fotos?: string[];
@@ -73,12 +75,12 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
 
             <div>
               <h4 className="font-semibold">Tipo de Produto</h4>
-              <p>{nonConformity.tipo_produto}</p>
+              <p>{nonConformity.tipo_produto_rotulo}</p>
             </div>
 
             <div>
               <h4 className="font-semibold">Ação Tomada</h4>
-              <p>{nonConformity.acao_tomada || 'Não definida'}</p>
+              <p>{nonConformity.acao_tomada_rotulo || 'Não definida'}</p>
             </div>
 
             <div>
