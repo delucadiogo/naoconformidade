@@ -7,10 +7,12 @@ export interface NonConformity {
   validade: string;
   lote: string;
   tipo_produto: string;
+  tipo_produto_rotulo?: string;
   descricao: string;
   fotos?: string[];
   data_liberacao?: string;
   acao_tomada: string;
+  acao_tomada_rotulo?: string;
   criado_em: string;
   criado_por_nome?: string;
 }
