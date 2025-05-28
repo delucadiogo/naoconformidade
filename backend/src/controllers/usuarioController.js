@@ -3,6 +3,20 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/database');
 
 /**
+ * Mapeia os campos do banco de dados para o formato do frontend
+ */
+const mapUserToFrontend = (user) => ({
+  id: user.id,
+  name: user.nome,
+  email: user.email,
+  role: user.funcao,
+  department: user.departamento,
+  isActive: user.ativo,
+  createdAt: user.criado_em,
+  updatedAt: user.atualizado_em
+});
+
+/**
  * Controller para gerenciamento de usuários
  */
 const usuarioController = {
@@ -12,9 +26,9 @@ const usuarioController = {
   async listar(req, res) {
     try {
       const resultado = await pool.query(
-        'SELECT id, nome, email, funcao, departamento, ativo FROM usuarios ORDER BY nome'
+        'SELECT id, nome, email, funcao, departamento, ativo, criado_em, atualizado_em FROM usuarios ORDER BY nome'
       );
-      res.json(resultado.rows);
+      res.json(resultado.rows.map(mapUserToFrontend));
     } catch (error) {
       console.error('Erro ao listar usuários:', error);
       res.status(500).json({ mensagem: 'Erro ao listar usuários' });
@@ -28,7 +42,7 @@ const usuarioController = {
     const { id } = req.params;
     try {
       const resultado = await pool.query(
-        'SELECT id, nome, email, funcao, departamento, ativo FROM usuarios WHERE id = $1',
+        'SELECT id, nome, email, funcao, departamento, ativo, criado_em, atualizado_em FROM usuarios WHERE id = $1',
         [id]
       );
 
@@ -36,7 +50,7 @@ const usuarioController = {
         return res.status(404).json({ mensagem: 'Usuário não encontrado' });
       }
 
-      res.json(resultado.rows[0]);
+      res.json(mapUserToFrontend(resultado.rows[0]));
     } catch (error) {
       console.error('Erro ao buscar usuário:', error);
       res.status(500).json({ mensagem: 'Erro ao buscar usuário' });
@@ -66,11 +80,11 @@ const usuarioController = {
 
       // Insere o novo usuário
       const resultado = await pool.query(
-        'INSERT INTO usuarios (nome, email, senha_hash, funcao, departamento, ativo) VALUES ($1, $2, $3, $4, $5, true) RETURNING id, nome, email, funcao, departamento, ativo',
+        'INSERT INTO usuarios (nome, email, senha_hash, funcao, departamento, ativo) VALUES ($1, $2, $3, $4, $5, true) RETURNING id, nome, email, funcao, departamento, ativo, criado_em, atualizado_em',
         [nome, email, senhaHash, funcao, departamento]
       );
 
-      res.status(201).json(resultado.rows[0]);
+      res.status(201).json(mapUserToFrontend(resultado.rows[0]));
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
       res.status(500).json({ mensagem: 'Erro ao criar usuário' });
@@ -116,7 +130,7 @@ const usuarioController = {
         paramCount++;
       }
 
-      query += ` WHERE id = $${paramCount + 1} RETURNING id, nome, email, funcao, departamento, ativo`;
+      query += ` WHERE id = $${paramCount + 1} RETURNING id, nome, email, funcao, departamento, ativo, criado_em, atualizado_em`;
       params.push(id);
 
       const resultado = await pool.query(query, params);
@@ -125,7 +139,7 @@ const usuarioController = {
         return res.status(404).json({ mensagem: 'Usuário não encontrado' });
       }
 
-      res.json(resultado.rows[0]);
+      res.json(mapUserToFrontend(resultado.rows[0]));
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
       res.status(500).json({ mensagem: 'Erro ao atualizar usuário' });
@@ -203,13 +217,7 @@ const usuarioController = {
       console.log('Login realizado com sucesso');
       res.json({
         token,
-        usuario: {
-          id: usuario.id,
-          nome: usuario.nome,
-          email: usuario.email,
-          funcao: usuario.funcao,
-          departamento: usuario.departamento
-        }
+        usuario: mapUserToFrontend(usuario)
       });
     } catch (error) {
       console.error('Erro detalhado ao realizar login:', error);
