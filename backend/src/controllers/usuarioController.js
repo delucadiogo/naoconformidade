@@ -7,13 +7,13 @@ const pool = require('../config/database');
  */
 const mapUserToFrontend = (user) => ({
   id: user.id,
-  name: user.nome,
+  nome: user.nome,
   email: user.email,
-  role: user.funcao,
-  department: user.departamento,
-  isActive: user.ativo,
-  createdAt: user.criado_em,
-  updatedAt: user.atualizado_em
+  funcao: user.funcao,
+  departamento: user.departamento,
+  ativo: user.ativo,
+  criado_em: user.criado_em,
+  atualizado_em: user.atualizado_em
 });
 
 /**
