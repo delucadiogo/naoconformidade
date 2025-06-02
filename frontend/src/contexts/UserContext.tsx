@@ -1,16 +1,24 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import userService, { User, UserInput } from '../services/userService';
-import { toast } from 'react-toastify';
+import userService, { User, UserInput } from '@/services/userService';
+import { toast } from 'sonner';
 
 interface UserContextData {
   users: User[];
   loading: boolean;
   addUser: (userData: UserInput) => Promise<void>;
-  updateUser: (id: number, userData: UserInput) => Promise<void>;
-  deleteUser: (id: number) => Promise<void>;
+  updateUser: (id: string, userData: UserInput) => Promise<void>;
+  deleteUser: (id: string) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextData>({} as UserContextData);
+
+export const useUsers = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUsers deve ser usado dentro de um UserProvider');
+  }
+  return context;
+};
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
@@ -36,7 +44,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const newUser = await userService.create(userData);
       setUsers(prevUsers => [...prevUsers, newUser]);
-      toast.success('Usuário criado com sucesso!');
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
       toast.error('Erro ao criar usuário');
@@ -44,13 +51,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updateUser = async (id: number, userData: UserInput) => {
+  const updateUser = async (id: string, userData: UserInput) => {
     try {
       const updatedUser = await userService.update(id, userData);
       setUsers(prevUsers =>
         prevUsers.map(user => (user.id === id ? updatedUser : user))
       );
-      toast.success('Usuário atualizado com sucesso!');
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
       toast.error('Erro ao atualizar usuário');
@@ -58,11 +64,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const deleteUser = async (id: number) => {
+  const deleteUser = async (id: string) => {
     try {
       await userService.delete(id);
       setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
-      toast.success('Usuário deletado com sucesso!');
     } catch (error) {
       console.error('Erro ao deletar usuário:', error);
       toast.error('Erro ao deletar usuário');
@@ -77,20 +82,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         loading,
         addUser,
         updateUser,
-        deleteUser,
+        deleteUser
       }}
     >
       {children}
     </UserContext.Provider>
   );
-};
-
-export const useUsers = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error('useUsers deve ser usado dentro de um UserProvider');
-  }
-  return context;
 };
 
 export default UserContext;

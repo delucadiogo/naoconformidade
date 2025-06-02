@@ -6,36 +6,35 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
 import Header from '../components/Header';
-import { toast } from 'react-toastify';
-import { UserInput, User } from '../services/userService';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const Users = () => {
-  const navigate = useNavigate();
   const { users, loading, addUser, updateUser, deleteUser } = useUsers();
-  const [editingUser, setEditingUser] = useState<number | null>(null);
+  const [editingUser, setEditingUser] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<UserInput>({
-    name: '',
+  const [formData, setFormData] = useState({
+    nome: '',
     email: '',
-    password: '',
-    role: 'user',
-    department: '',
-    isActive: true
+    senha: '',
+    funcao: 'usuario',
+    departamento: '',
+    ativo: true
   });
 
   const resetForm = () => {
     setFormData({
-      name: '',
+      nome: '',
       email: '',
-      password: '',
-      role: 'user',
-      department: '',
-      isActive: true
+      senha: '',
+      funcao: 'usuario',
+      departamento: '',
+      ativo: true
     });
     setEditingUser(null);
   };
@@ -58,21 +57,21 @@ const Users = () => {
     }
   };
 
-  const handleEdit = (user: User) => {
+  const handleEdit = (user: any) => {
     setEditingUser(user.id);
     setFormData({
-      name: user.name,
+      nome: user.nome,
       email: user.email,
-      password: '',
-      role: user.role,
-      department: user.department,
-      isActive: user.isActive
+      senha: '',
+      funcao: user.funcao,
+      departamento: user.departamento,
+      ativo: user.ativo
     });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
       try {
         await deleteUser(id);
         toast.success('Usuário excluído com sucesso!');
@@ -83,13 +82,18 @@ const Users = () => {
     }
   };
 
-  const getRoleBadge = (role: string) => {
+  const getFuncaoBadge = (funcao: string) => {
     const variants = {
       admin: 'destructive',
-      user: 'default',
-      viewer: 'secondary'
-    };
-    return <Badge variant={variants[role as keyof typeof variants]}>{role}</Badge>;
+      usuario: 'default',
+      visualizador: 'secondary'
+    } as const;
+    return <Badge variant={variants[funcao as keyof typeof variants] || 'default'}>{funcao}</Badge>;
+  };
+
+  const formatDate = (date: string) => {
+    if (!date) return '-';
+    return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
   };
 
   if (loading) {
@@ -113,14 +117,66 @@ const Users = () => {
           </Button>
         </div>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Usuários Cadastrados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Função</TableHead>
+                  <TableHead>Departamento</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Criado em</TableHead>
+                  <TableHead>Atualizado em</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.nome}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{getFuncaoBadge(user.funcao)}</TableCell>
+                    <TableCell>{user.departamento}</TableCell>
+                    <TableCell>
+                      <Badge variant={user.ativo ? 'default' : 'secondary'}>
+                        {user.ativo ? 'Ativo' : 'Inativo'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatDate(user.criado_em)}</TableCell>
+                    <TableCell>{formatDate(user.atualizado_em)}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(user)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(user.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Usuário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>
                 {editingUser ? 'Editar Usuário' : 'Novo Usuário'}
@@ -128,11 +184,11 @@ const Users = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="name">Nome</Label>
+                <Label htmlFor="nome">Nome</Label>
                 <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  id="nome"
+                  value={formData.nome}
+                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                   required
                 />
               </div>
@@ -147,47 +203,45 @@ const Users = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="password">
-                  {editingUser ? 'Senha (deixe em branco para manter a atual)' : 'Senha'}
-                </Label>
+                <Label htmlFor="senha">Senha</Label>
                 <Input
-                  id="password"
+                  id="senha"
                   type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  value={formData.senha}
+                  onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
                   required={!editingUser}
                 />
               </div>
               <div>
-                <Label htmlFor="role">Função</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                <Label htmlFor="funcao">Função</Label>
+                <Select value={formData.funcao} onValueChange={(value) => setFormData({ ...formData, funcao: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="user">Usuário</SelectItem>
-                    <SelectItem value="viewer">Visualizador</SelectItem>
+                    <SelectItem value="usuario">Usuário</SelectItem>
+                    <SelectItem value="visualizador">Visualizador</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="department">Departamento</Label>
+                <Label htmlFor="departamento">Departamento</Label>
                 <Input
-                  id="department"
-                  value={formData.department}
-                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  id="departamento"
+                  value={formData.departamento}
+                  onChange={(e) => setFormData({ ...formData, departamento: e.target.value })}
                   required
                 />
               </div>
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  id="ativo"
+                  checked={formData.ativo}
+                  onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
                 />
-                <Label htmlFor="isActive">Usuário Ativo</Label>
+                <Label htmlFor="ativo">Usuário Ativo</Label>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -200,60 +254,6 @@ const Users = () => {
             </form>
           </DialogContent>
         </Dialog>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Usuários Cadastrados</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Função</TableHead>
-                  <TableHead>Departamento</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{getRoleBadge(user.role)}</TableCell>
-                    <TableCell>{user.department}</TableCell>
-                    <TableCell>
-                      <Badge variant={user.isActive ? 'success' : 'secondary'}>
-                        {user.isActive ? 'Ativo' : 'Inativo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(user)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(user.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
