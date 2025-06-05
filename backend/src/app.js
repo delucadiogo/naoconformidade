@@ -5,14 +5,18 @@ const routes = require('./routes');
 
 const app = express();
 
-// Configuração mais específica do CORS
-app.use(cors({
-  origin: ['http://192.168.2.175:8060', 'http://localhost:8060'],
+// Configuração do CORS
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? true // Permite todas as origens em produção
+    : ['http://localhost:8060', 'http://192.168.2.175:8060'], // Restringe em desenvolvimento
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
   exposedHeaders: ['Content-Length', 'Content-Range']
-}));
+};
+
+app.use(cors(corsOptions));
 
 // Configuração para servir arquivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));

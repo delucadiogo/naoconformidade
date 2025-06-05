@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 // Configuração base do axios
 export const api = axios.create({
-  baseURL: 'http://192.168.2.175:3001',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
   timeout: 10000, // 10 segundos
   headers: {
     'Content-Type': 'application/json',
