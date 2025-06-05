@@ -16,10 +16,6 @@ COPY . .
 # Criar diretório para uploads
 RUN mkdir -p uploads && chmod 777 uploads
 
-# Adiciona o script de migração
-COPY scripts/run-migrations.sh /app/scripts/
-RUN chmod +x /app/scripts/run-migrations.sh
-
 # Expor porta 3000
 EXPOSE 3000
 
