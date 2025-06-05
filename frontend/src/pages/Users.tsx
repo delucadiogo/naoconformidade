@@ -19,37 +19,29 @@ const Users = () => {
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    nome: '',
+    name: '',
     email: '',
-    senha: '',
-    funcao: 'usuario',
-    departamento: '',
-    ativo: true
+    password: '',
+    role: 'usuario',
+    department: '',
+    isActive: true
   });
 
   const resetForm = () => {
     setFormData({
-      nome: '',
+      name: '',
       email: '',
-      senha: '',
-      funcao: 'usuario',
-      departamento: '',
-      ativo: true
+      password: '',
+      role: 'usuario',
+      department: '',
+      isActive: true
     });
     setEditingUser(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mapeia os campos do formulário para o padrão do backend
-    const userPayload = {
-      name: formData.nome,
-      email: formData.email,
-      password: formData.senha || undefined,
-      role: formData.funcao,
-      department: formData.departamento,
-      isActive: formData.ativo
-    };
+    const userPayload = { ...formData };
     try {
       if (editingUser) {
         await updateUser(editingUser, userPayload);
@@ -69,12 +61,12 @@ const Users = () => {
   const handleEdit = (user: any) => {
     setEditingUser(user.id);
     setFormData({
-      nome: user.nome,
+      name: user.name,
       email: user.email,
-      senha: '',
-      funcao: user.funcao,
-      departamento: user.departamento,
-      ativo: user.ativo
+      password: '',
+      role: user.role,
+      department: user.department,
+      isActive: user.isActive
     });
     setIsDialogOpen(true);
   };
@@ -147,17 +139,17 @@ const Users = () => {
               <TableBody>
                 {users.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.nome}</TableCell>
+                    <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{getFuncaoBadge(user.funcao)}</TableCell>
-                    <TableCell>{user.departamento}</TableCell>
+                    <TableCell>{getFuncaoBadge(user.role)}</TableCell>
+                    <TableCell>{user.department}</TableCell>
                     <TableCell>
-                      <Badge variant={user.ativo ? 'default' : 'secondary'}>
-                        {user.ativo ? 'Ativo' : 'Inativo'}
+                      <Badge variant={user.isActive ? 'default' : 'secondary'}>
+                        {user.isActive ? 'Ativo' : 'Inativo'}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formatDate(user.criado_em)}</TableCell>
-                    <TableCell>{formatDate(user.atualizado_em)}</TableCell>
+                    <TableCell>{formatDate(user.createdAt)}</TableCell>
+                    <TableCell>{formatDate(user.updatedAt)}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button
@@ -193,11 +185,11 @@ const Users = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="nome">Nome</Label>
+                <Label htmlFor="name">Nome</Label>
                 <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </div>
@@ -212,18 +204,18 @@ const Users = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="senha">Senha</Label>
+                <Label htmlFor="password">Senha</Label>
                 <Input
-                  id="senha"
+                  id="password"
                   type="password"
-                  value={formData.senha}
-                  onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required={!editingUser}
                 />
               </div>
               <div>
-                <Label htmlFor="funcao">Função</Label>
-                <Select value={formData.funcao} onValueChange={(value) => setFormData({ ...formData, funcao: value })}>
+                <Label htmlFor="role">Função</Label>
+                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -235,22 +227,22 @@ const Users = () => {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="departamento">Departamento</Label>
+                <Label htmlFor="department">Departamento</Label>
                 <Input
-                  id="departamento"
-                  value={formData.departamento}
-                  onChange={(e) => setFormData({ ...formData, departamento: e.target.value })}
+                  id="department"
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                   required
                 />
               </div>
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="ativo"
-                  checked={formData.ativo}
-                  onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 />
-                <Label htmlFor="ativo">Usuário Ativo</Label>
+                <Label htmlFor="isActive">Usuário Ativo</Label>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
