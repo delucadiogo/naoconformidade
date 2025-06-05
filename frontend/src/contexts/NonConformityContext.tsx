@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { nonConformityService, CreateNonConformityDTO, NonConformity } from '@/services/nonConformityService';
 import { toast } from 'sonner';
+import { useAuth } from './AuthContext';
 
 interface NonConformityContextType {
   nonConformities: NonConformity[];
@@ -25,11 +26,13 @@ export const useNonConformity = () => {
 
 export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Buscar todas as não conformidades
   const { data: nonConformities = [], isLoading, error } = useQuery({
     queryKey: ['nonConformities'],
-    queryFn: nonConformityService.getAll
+    queryFn: nonConformityService.getAll,
+    enabled: !!user // Só executa a query se houver um usuário autenticado
   });
 
   // Adicionar não conformidade
@@ -73,14 +76,26 @@ export const NonConformityProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const addNonConformity = async (data: CreateNonConformityDTO) => {
+    if (!user) {
+      toast.error('Você precisa estar autenticado para criar uma não conformidade');
+      return;
+    }
     await addMutation.mutateAsync(data);
   };
 
   const updateNonConformity = async (id: string, data: Partial<CreateNonConformityDTO>) => {
+    if (!user) {
+      toast.error('Você precisa estar autenticado para atualizar uma não conformidade');
+      return;
+    }
     await updateMutation.mutateAsync({ id, data });
   };
 
   const deleteNonConformity = async (id: string) => {
+    if (!user) {
+      toast.error('Você precisa estar autenticado para deletar uma não conformidade');
+      return;
+    }
     await deleteMutation.mutateAsync(id);
   };
 

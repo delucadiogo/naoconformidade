@@ -1,32 +1,41 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import ConfigService, { ConfigType } from '../services/configService';
-import { isAuthenticated } from '../utils/auth';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import ConfigService, { ConfigType, ConfigInput } from '@/services/configService';
+import { toast } from 'sonner';
+import { useAuth } from './AuthContext';
 
-interface ConfigContextType {
+interface ConfigContextData {
   productTypes: ConfigType[];
   actionTypes: ConfigType[];
-  addProductType: (label: string, value: string) => Promise<void>;
-  removeProductType: (id: number) => Promise<void>;
-  addActionType: (label: string, value: string) => Promise<void>;
-  removeActionType: (id: number) => Promise<void>;
   loading: boolean;
+  addProductType: (data: ConfigInput) => Promise<void>;
+  removeProductType: (id: number) => Promise<void>;
+  addActionType: (data: ConfigInput) => Promise<void>;
+  removeActionType: (id: number) => Promise<void>;
 }
 
-const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
+const ConfigContext = createContext<ConfigContextData>({} as ConfigContextData);
 
-export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const useConfig = () => {
+  const context = useContext(ConfigContext);
+  if (!context) {
+    throw new Error('useConfig must be used within a ConfigProvider');
+  }
+  return context;
+};
+
+export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [productTypes, setProductTypes] = useState<ConfigType[]>([]);
   const [actionTypes, setActionTypes] = useState<ConfigType[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (user) {
       loadConfigs();
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const loadConfigs = async () => {
     try {
@@ -37,32 +46,22 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       ]);
       setProductTypes(productTypesData);
       setActionTypes(actionTypesData);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao carregar configurações:', error);
-      if (error.response?.status === 401) {
-        toast.error('Sessão expirada. Por favor, faça login novamente.');
-      } else {
-        toast.error('Erro ao carregar configurações');
-      }
+      toast.error('Erro ao carregar configurações');
     } finally {
       setLoading(false);
     }
   };
 
-  const addProductType = async (label: string, value: string) => {
+  const addProductType = async (data: ConfigInput) => {
     try {
-      const newType = await ConfigService.createProductType({ label, value });
+      const newType = await ConfigService.createProductType(data);
       setProductTypes(prev => [...prev, newType]);
       toast.success('Tipo de produto adicionado com sucesso!');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao adicionar tipo de produto:', error);
-      if (error.response?.status === 401) {
-        toast.error('Sessão expirada. Por favor, faça login novamente.');
-      } else if (error.response?.data?.error === 'Valor já existe') {
-        toast.error('Este valor já está em uso');
-      } else {
-        toast.error('Erro ao adicionar tipo de produto');
-      }
+      toast.error('Erro ao adicionar tipo de produto');
       throw error;
     }
   };
@@ -72,31 +71,21 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await ConfigService.deleteProductType(id);
       setProductTypes(prev => prev.filter(type => type.id !== id));
       toast.success('Tipo de produto removido com sucesso!');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao remover tipo de produto:', error);
-      if (error.response?.status === 401) {
-        toast.error('Sessão expirada. Por favor, faça login novamente.');
-      } else {
-        toast.error('Erro ao remover tipo de produto');
-      }
+      toast.error('Erro ao remover tipo de produto');
       throw error;
     }
   };
 
-  const addActionType = async (label: string, value: string) => {
+  const addActionType = async (data: ConfigInput) => {
     try {
-      const newType = await ConfigService.createActionType({ label, value });
+      const newType = await ConfigService.createActionType(data);
       setActionTypes(prev => [...prev, newType]);
       toast.success('Tipo de ação adicionado com sucesso!');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao adicionar tipo de ação:', error);
-      if (error.response?.status === 401) {
-        toast.error('Sessão expirada. Por favor, faça login novamente.');
-      } else if (error.response?.data?.error === 'Valor já existe') {
-        toast.error('Este valor já está em uso');
-      } else {
-        toast.error('Erro ao adicionar tipo de ação');
-      }
+      toast.error('Erro ao adicionar tipo de ação');
       throw error;
     }
   };
@@ -106,13 +95,9 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await ConfigService.deleteActionType(id);
       setActionTypes(prev => prev.filter(type => type.id !== id));
       toast.success('Tipo de ação removido com sucesso!');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao remover tipo de ação:', error);
-      if (error.response?.status === 401) {
-        toast.error('Sessão expirada. Por favor, faça login novamente.');
-      } else {
-        toast.error('Erro ao remover tipo de ação');
-      }
+      toast.error('Erro ao remover tipo de ação');
       throw error;
     }
   };
@@ -122,22 +107,14 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       value={{
         productTypes,
         actionTypes,
+        loading,
         addProductType,
         removeProductType,
         addActionType,
-        removeActionType,
-        loading
+        removeActionType
       }}
     >
       {children}
     </ConfigContext.Provider>
   );
-};
-
-export const useConfig = () => {
-  const context = useContext(ConfigContext);
-  if (context === undefined) {
-    throw new Error('useConfig must be used within a ConfigProvider');
-  }
-  return context;
 };
