@@ -186,6 +186,13 @@ const usuarioController = {
 
       const usuario = resultado.rows[0];
       console.log('Usuário encontrado:', usuario ? 'Sim' : 'Não');
+      if (usuario) {
+        console.log('Dados do usuário:', {
+          id: usuario.id,
+          email: usuario.email,
+          senha_hash: usuario.senha_hash
+        });
+      }
 
       if (!usuario) {
         console.log('Usuário não encontrado');
@@ -193,6 +200,9 @@ const usuarioController = {
       }
 
       console.log('Verificando senha...');
+      console.log('Senha fornecida:', senha);
+      console.log('Hash armazenado:', usuario.senha_hash);
+      
       // Verifica a senha
       const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
       console.log('Senha válida:', senhaValida ? 'Sim' : 'Não');
