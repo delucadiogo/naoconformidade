@@ -1,49 +1,49 @@
-const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
-
-const pool = new Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: process.env.POSTGRES_PORT || 5432,
-  database: process.env.POSTGRES_DB || 'nao_conformidades',
-  user: process.env.POSTGRES_USER || 'postgres',
-  password: process.env.POSTGRES_PASSWORD || 'postgres',
-});
+const { pool } = require('../src/config/database');
 
 async function checkUser() {
   try {
-    console.log('Conectando ao banco de dados...');
-    
-    const result = await pool.query(
-      'SELECT id, nome, email, senha_hash FROM usuarios WHERE email = $1',
-      ['ti01@oliveira.com.br']
+    const email = 'ti01@oliveira.com.br';
+    const senha = 'Xinxuan99';
+
+    console.log('Verificando usuário:', email);
+
+    // Busca o usuário
+    const resultado = await pool.query(
+      'SELECT * FROM usuarios WHERE email = $1',
+      [email]
     );
 
-    if (result.rows.length > 0) {
-      const user = result.rows[0];
-      console.log('Usuário encontrado:');
-      console.log('ID:', user.id);
-      console.log('Nome:', user.nome);
-      console.log('Email:', user.email);
-      console.log('Senha hash:', user.senha_hash);
+    const usuario = resultado.rows[0];
 
-      // Testa a senha
-      const senha = 'Xinxuan99';
-      const senhaValida = await bcrypt.compare(senha, user.senha_hash);
-      console.log('\nTeste de senha:');
-      console.log('Senha fornecida:', senha);
-      console.log('Senha é válida:', senhaValida);
-
-      // Gera um novo hash para comparação
-      const salt = await bcrypt.genSalt(10);
-      const novoHash = await bcrypt.hash(senha, salt);
-      console.log('\nNovo hash gerado:', novoHash);
-      console.log('Comparação com novo hash:', await bcrypt.compare(senha, novoHash));
-    } else {
+    if (!usuario) {
       console.log('Usuário não encontrado no banco de dados');
+      return;
     }
+
+    console.log('Usuário encontrado:', {
+      id: usuario.id,
+      email: usuario.email,
+      senha_hash: usuario.senha_hash
+    });
+
+    // Gera um novo hash para comparação
+    const salt = await bcrypt.genSalt(10);
+    const novoHash = await bcrypt.hash(senha, salt);
+    console.log('Novo hash gerado:', novoHash);
+
+    // Verifica a senha
+    const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
+    console.log('Senha válida:', senhaValida ? 'Sim' : 'Não');
+
+    if (!senhaValida) {
+      console.log('A senha fornecida não corresponde ao hash armazenado');
+    }
+
   } catch (error) {
     console.error('Erro ao verificar usuário:', error);
   } finally {
+    // Fecha a conexão com o banco
     await pool.end();
   }
 }
