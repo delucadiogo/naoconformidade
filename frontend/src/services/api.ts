@@ -36,11 +36,12 @@ api.interceptors.response.use(
       console.error('Dados do erro:', error.response.data);
       console.error('Status do erro:', error.response.status);
       
-      // Se o erro for 401, limpa o token e redireciona para login
+      // Se o erro for 401, limpa o token e dispara um evento customizado
       if (error.response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/';
+        // Dispara um evento customizado para notificar sobre o logout
+        window.dispatchEvent(new Event('auth:logout'));
       }
     } else if (error.request) {
       // A requisição foi feita mas não houve resposta
