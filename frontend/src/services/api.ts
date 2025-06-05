@@ -2,8 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 // Configuração base do axios
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-  timeout: 30000, // Aumentado para 30 segundos
+  baseURL: import.meta.env.VITE_API_URL || 'http://45.172.159.8:3000',
+  timeout: 30000, // 30 segundos
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,7 +12,7 @@ export const api = axios.create({
 // Interceptor para adicionar token em todas as requisições
 api.interceptors.request.use(
   (config) => {
-    console.log('Iniciando requisição para:', config.url);
+    console.log('Iniciando requisição para:', config.url, 'URL completa:', config.baseURL + config.url);
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -44,6 +44,7 @@ api.interceptors.response.use(
       // A requisição foi feita mas não houve resposta
       console.error('Erro de conexão - sem resposta do servidor');
       console.error('URL tentada:', error.config.url);
+      console.error('URL base:', error.config.baseURL);
       console.error('Método:', error.config.method);
     } else {
       // Erro na configuração da requisição
