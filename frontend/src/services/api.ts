@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 // Configuração base do axios
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
-  timeout: 10000, // 10 segundos
+  timeout: 30000, // Aumentado para 30 segundos
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,6 +12,7 @@ export const api = axios.create({
 // Interceptor para adicionar token em todas as requisições
 api.interceptors.request.use(
   (config) => {
+    console.log('Iniciando requisição para:', config.url);
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -27,10 +28,14 @@ api.interceptors.request.use(
 // Interceptor para tratamento de respostas
 api.interceptors.response.use(
   (response) => {
+    console.log('Resposta recebida de:', response.config.url);
     return response;
   },
   (error) => {
     console.error('Erro na resposta da API:', error);
+    if (error.code === 'ECONNABORTED') {
+      console.error('Timeout na conexão. Verifique se o servidor está acessível e se a URL está correta:', error.config.baseURL);
+    }
     if (error.response) {
       // O servidor respondeu com um status de erro
       console.error('Dados do erro:', error.response.data);
@@ -38,6 +43,8 @@ api.interceptors.response.use(
     } else if (error.request) {
       // A requisição foi feita mas não houve resposta
       console.error('Erro de conexão - sem resposta do servidor');
+      console.error('URL tentada:', error.config.url);
+      console.error('Método:', error.config.method);
     } else {
       // Erro na configuração da requisição
       console.error('Erro na configuração da requisição:', error.message);

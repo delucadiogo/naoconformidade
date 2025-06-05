@@ -5,6 +5,13 @@ const routes = require('./routes');
 
 const app = express();
 
+// Log de todas as requisições
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  next();
+});
+
 // Configuração do CORS
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
@@ -32,6 +39,9 @@ app.use('/api', routes);
 app.use((err, req, res, next) => {
   console.error('Erro:', err.message);
   console.error('Stack:', err.stack);
+  console.error('URL que causou o erro:', req.url);
+  console.error('Método que causou o erro:', req.method);
+  console.error('Headers da requisição:', req.headers);
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
