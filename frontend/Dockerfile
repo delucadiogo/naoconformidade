@@ -6,32 +6,25 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
-# Copiar package.json e package-lock.json
+# Copiar apenas os arquivos de dependência primeiro
 COPY package*.json ./
 
-# Limpar cache do npm e instalar dependências com mais verbosidade
-RUN npm cache clean --force
-RUN npm install --legacy-peer-deps --verbose
+# Instalar dependências com mais verbosidade e sem audit
+RUN npm ci --verbose --no-audit --no-optional && npm cache clean --force
 
-# Copiar resto dos arquivos
+# Copiar o resto dos arquivos do projeto
 COPY . .
 
-# Criar arquivo .env
+# Criar arquivo .env com as variáveis de ambiente
 RUN echo "VITE_API_URL=http://backend:3000/api" > .env
 
-# Mostrar conteúdo do diretório e ambiente para debug
-RUN ls -la
-RUN npm list || true
-RUN node -v
-RUN npm -v
-
-# Build com mais informações de debug
-RUN NODE_ENV=production npm run build --verbose
+# Build da aplicação
+RUN npm run build || (echo "Build failed" && npm run build --verbose && exit 1)
 
 # Production stage
 FROM nginx:alpine
 
-# Copiar build do React
+# Copiar a build do React
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copiar configuração do Nginx
