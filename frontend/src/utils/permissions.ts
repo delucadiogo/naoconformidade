@@ -2,13 +2,13 @@ export type UserRole = 'admin' | 'administrador' | 'usuario' | 'visualizador';
 
 export interface User {
   id: string;
-  nome: string;
+  name: string;
   email: string;
-  funcao: UserRole;
+  role: UserRole;
 }
 
 export const isAdmin = (user: User | null): boolean => {
-  return user?.funcao === 'admin' || user?.funcao === 'administrador';
+  return user?.role === 'admin' || user?.role === 'administrador';
 };
 
 export const canManageUsers = (user: User | null): boolean => {
