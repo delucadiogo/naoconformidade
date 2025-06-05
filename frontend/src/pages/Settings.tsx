@@ -39,7 +39,10 @@ const Settings = () => {
     if (newProductLabel.trim() && newProductValue.trim()) {
       try {
         setIsSubmitting(true);
-        await addProductType(newProductLabel.trim(), newProductValue.trim());
+        await addProductType({
+          label: newProductLabel.trim(),
+          value: newProductValue.trim()
+        });
         setNewProductLabel('');
         setNewProductValue('');
       } catch (error) {
@@ -55,7 +58,10 @@ const Settings = () => {
     if (newActionLabel.trim() && newActionValue.trim()) {
       try {
         setIsSubmitting(true);
-        await addActionType(newActionLabel.trim(), newActionValue.trim());
+        await addActionType({
+          label: newActionLabel.trim(),
+          value: newActionValue.trim()
+        });
         setNewActionLabel('');
         setNewActionValue('');
       } catch (error) {
@@ -67,73 +73,72 @@ const Settings = () => {
   };
 
   const handleRemoveProductType = async (id: number) => {
-    if (confirm('Tem certeza que deseja remover este tipo de produto?')) {
-      try {
-        await removeProductType(id);
-      } catch (error) {
-        // Erro já é tratado no contexto
-      }
+    try {
+      await removeProductType(id);
+    } catch (error) {
+      // Erro já é tratado no contexto
     }
   };
 
   const handleRemoveActionType = async (id: number) => {
-    if (confirm('Tem certeza que deseja remover este tipo de ação?')) {
-      try {
-        await removeActionType(id);
-      } catch (error) {
-        // Erro já é tratado no contexto
-      }
+    try {
+      await removeActionType(id);
+    } catch (error) {
+      // Erro já é tratado no contexto
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-          <p className="text-slate-600">Carregando configurações...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-slate-50">
       <Header />
-      
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-slate-800">Configurações do Sistema</h1>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="mr-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+          <h1 className="text-2xl font-bold text-slate-900">Configurações</h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Product Types */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-slate-800">Tipos de Produto</CardTitle>
+              <CardTitle>Tipos de Produto</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <form onSubmit={handleAddProductType} className="space-y-3">
-                <div>
-                  <Label htmlFor="productLabel">Nome do Tipo</Label>
+            <CardContent>
+              <form onSubmit={handleAddProductType} className="space-y-4 mb-6">
+                <div className="space-y-2">
+                  <Label htmlFor="productLabel">Rótulo</Label>
                   <Input
                     id="productLabel"
                     value={newProductLabel}
                     onChange={(e) => setNewProductLabel(e.target.value)}
-                    placeholder="Ex: Produto Acabado"
-                    className="mt-1"
-                    disabled={isSubmitting}
+                    placeholder="Digite o rótulo"
+                    required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="productValue">Valor Interno</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="productValue">Valor</Label>
                   <Input
                     id="productValue"
                     value={newProductValue}
                     onChange={(e) => setNewProductValue(e.target.value)}
-                    placeholder="Ex: produto_acabado"
-                    className="mt-1"
-                    disabled={isSubmitting}
+                    placeholder="Digite o valor"
+                    required
                   />
                 </div>
                 <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
@@ -170,30 +175,28 @@ const Settings = () => {
           {/* Action Types */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-slate-800">Ações Tomadas</CardTitle>
+              <CardTitle>Tipos de Ação</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <form onSubmit={handleAddActionType} className="space-y-3">
-                <div>
-                  <Label htmlFor="actionLabel">Nome da Ação</Label>
+            <CardContent>
+              <form onSubmit={handleAddActionType} className="space-y-4 mb-6">
+                <div className="space-y-2">
+                  <Label htmlFor="actionLabel">Rótulo</Label>
                   <Input
                     id="actionLabel"
                     value={newActionLabel}
                     onChange={(e) => setNewActionLabel(e.target.value)}
-                    placeholder="Ex: Liberada para Comercialização"
-                    className="mt-1"
-                    disabled={isSubmitting}
+                    placeholder="Digite o rótulo"
+                    required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="actionValue">Valor Interno</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="actionValue">Valor</Label>
                   <Input
                     id="actionValue"
                     value={newActionValue}
                     onChange={(e) => setNewActionValue(e.target.value)}
-                    placeholder="Ex: liberada_comercializacao"
-                    className="mt-1"
-                    disabled={isSubmitting}
+                    placeholder="Digite o valor"
+                    required
                   />
                 </div>
                 <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
@@ -202,7 +205,7 @@ const Settings = () => {
                   ) : (
                     <Plus className="h-4 w-4 mr-2" />
                   )}
-                  Adicionar Ação
+                  Adicionar Tipo
                 </Button>
               </form>
 
