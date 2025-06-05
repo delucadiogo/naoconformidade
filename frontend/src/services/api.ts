@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 // Configuração base do axios
 export const api = axios.create({
-  baseURL: 'http://192.168.2.175:3001',
+  baseURL: 'http://192.168.2.175:3001/api',
   timeout: 10000, // 10 segundos
   headers: {
     'Content-Type': 'application/json',
@@ -35,6 +35,13 @@ api.interceptors.response.use(
       // O servidor respondeu com um status de erro
       console.error('Dados do erro:', error.response.data);
       console.error('Status do erro:', error.response.status);
+      
+      // Se o erro for 401, limpa o token e redireciona para login
+      if (error.response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+      }
     } else if (error.request) {
       // A requisição foi feita mas não houve resposta
       console.error('Erro de conexão - sem resposta do servidor');
@@ -60,7 +67,7 @@ export const authService = {
   login: async (email: string, senha: string) => {
     try {
       console.log('Iniciando requisição de login:', { email });
-      const response = await api.post('/api/auth/login', { email, senha });
+      const response = await api.post('/usuarios/login', { email, senha });
       console.log('Resposta do login:', response.data);
       return response.data;
     } catch (error) {
@@ -72,22 +79,22 @@ export const authService = {
 
 export const userService = {
   create: async (data: any) => {
-    const response = await api.post('/api/usuarios', data);
+    const response = await api.post('/usuarios', data);
     return response.data;
   },
 
   update: async (id: string, data: any) => {
-    const response = await api.put(`/api/usuarios/${id}`, data);
+    const response = await api.put(`/usuarios/${id}`, data);
     return response.data;
   },
 
   delete: async (id: string) => {
-    const response = await api.delete(`/api/usuarios/${id}`);
+    const response = await api.delete(`/usuarios/${id}`);
     return response.data;
   },
 
   getAll: async () => {
-    const response = await api.get('/api/usuarios');
+    const response = await api.get('/usuarios');
     return response.data;
   }
 };
