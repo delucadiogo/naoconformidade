@@ -33,7 +33,7 @@ class ConfigService {
 
   static async createProductType(data: ConfigInput): Promise<ConfigType> {
     console.log('Enviando dados para criar tipo de produto:', data);
-    const response = await api.post('/api/config/product-types', JSON.stringify(data), this.getHeaders());
+    const response = await api.post('/api/config/product-types', data, this.getHeaders());
     return response.data;
   }
 
@@ -49,7 +49,7 @@ class ConfigService {
 
   static async createActionType(data: ConfigInput): Promise<ConfigType> {
     console.log('Enviando dados para criar tipo de ação:', data);
-    const response = await api.post('/api/config/action-types', JSON.stringify(data), this.getHeaders());
+    const response = await api.post('/api/config/action-types', data, this.getHeaders());
     return response.data;
   }
 
