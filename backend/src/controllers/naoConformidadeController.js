@@ -59,8 +59,9 @@ const naoConformidadeController = {
       const resultado = await pool.query(
         `INSERT INTO nao_conformidades 
         (data_lancamento, nome_produto, validade, lote, tipo_produto, descricao, 
-         fotos, data_liberacao, acao_tomada, criado_por_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         fotos, data_liberacao, acao_tomada, criado_por_id, titulo, local, 
+         data_ocorrencia, data_deteccao, status, tipo, gravidade)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING *`,
         [
           formatarData(data_lancamento),
@@ -72,7 +73,14 @@ const naoConformidadeController = {
           fotos,
           formatarData(data_liberacao),
           acao_tomada,
-          criado_por
+          criado_por,
+          nome_produto, // usando nome_produto como título
+          'Local não especificado', // valor padrão para local
+          formatarData(data_lancamento), // usando data_lancamento como data_ocorrencia
+          formatarData(data_lancamento), // usando data_lancamento como data_deteccao
+          'Pendente', // status padrão
+          tipo_produto, // usando tipo_produto como tipo
+          'Média' // gravidade padrão
         ]
       );
 
@@ -176,8 +184,9 @@ const naoConformidadeController = {
         `UPDATE nao_conformidades 
          SET data_lancamento = $1, nome_produto = $2, validade = $3, 
              lote = $4, tipo_produto = $5, descricao = $6, 
-             data_liberacao = $7, acao_tomada = $8, fotos = $9
-         WHERE id = $10
+             data_liberacao = $7, acao_tomada = $8, fotos = $9,
+             titulo = $10
+         WHERE id = $11
          RETURNING *`,
         [
           formatarData(data_lancamento),
@@ -189,6 +198,7 @@ const naoConformidadeController = {
           formatarData(data_liberacao),
           acao_tomada,
           todasFotos,
+          nome_produto, // usando nome_produto como título
           id
         ]
       );
@@ -218,20 +228,19 @@ const naoConformidadeController = {
         return res.status(404).json({ mensagem: 'Não conformidade não encontrada' });
       }
 
-      // Deleta o registro
-      await pool.query('DELETE FROM nao_conformidades WHERE id = $1', [id]);
-
       // Deleta as fotos do sistema de arquivos
       const fotos = naoConformidade.rows[0].fotos || [];
       for (const foto of fotos) {
         try {
-          await fs.unlink(path.join(__dirname, '..', '..', process.env.UPLOAD_FOLDER, foto));
+          await fs.unlink(path.join(__dirname, '../../uploads', foto));
         } catch (error) {
-          console.error(`Erro ao deletar arquivo ${foto}:`, error);
+          console.error(`Erro ao deletar foto ${foto}:`, error);
         }
       }
 
-      console.log(`Não conformidade deletada - ID: ${id}`);
+      // Deleta a não conformidade
+      await pool.query('DELETE FROM nao_conformidades WHERE id = $1', [id]);
+
       res.json({ mensagem: 'Não conformidade deletada com sucesso' });
     } catch (error) {
       console.error('Erro ao deletar não conformidade:', error);
