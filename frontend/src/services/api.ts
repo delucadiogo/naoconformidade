@@ -11,11 +11,13 @@ export const api = axios.create({
 
 // Função para configurar o token no axios
 const setAuthToken = (token: string) => {
+  console.log('Configurando token no axios:', token);
   api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 };
 
 // Função para remover o token do axios
 const removeAuthToken = () => {
+  console.log('Removendo token do axios');
   delete api.defaults.headers.common['Authorization'];
 };
 
@@ -23,9 +25,11 @@ const removeAuthToken = () => {
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log('Interceptor de requisição - Token:', token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('Headers da requisição:', config.headers);
     return config;
   },
   (error) => {
@@ -37,6 +41,12 @@ api.interceptors.request.use(
 // Interceptor para tratamento de respostas
 api.interceptors.response.use(
   (response) => {
+    console.log('Resposta recebida:', {
+      status: response.status,
+      data: response.data,
+      url: response.config?.url,
+      method: response.config?.method
+    });
     return response;
   },
   (error) => {
@@ -50,11 +60,13 @@ api.interceptors.response.use(
         status,
         data,
         url: error.config?.url,
-        method: error.config?.method
+        method: error.config?.method,
+        headers: error.config?.headers
       });
 
       // Se o erro for 401, limpa o token e dispara um evento customizado
       if (status === 401) {
+        console.log('Erro 401 detectado, limpando token e disparando evento de logout');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         removeAuthToken();
@@ -64,7 +76,8 @@ api.interceptors.response.use(
       // A requisição foi feita mas não houve resposta
       console.error('Erro de conexão - sem resposta do servidor:', {
         url: error.config?.url,
-        method: error.config?.method
+        method: error.config?.method,
+        headers: error.config?.headers
       });
     } else {
       // Erro na configuração da requisição

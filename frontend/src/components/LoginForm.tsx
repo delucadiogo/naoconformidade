@@ -18,9 +18,12 @@ const LoginForm = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('Tentando fazer login com:', { email });
       const success = await login(email, senha);
+      console.log('Resultado do login:', success);
       
       if (!success) {
+        console.log('Login falhou');
         setError('Email ou senha incorretos');
       }
     } catch (error) {
@@ -83,8 +86,8 @@ const LoginForm = () => {
           </form>
           <div className="mt-4 text-sm text-slate-600">
             <strong>Credenciais de teste:</strong><br />
-            Email: admin@empresa.com<br />
-            Senha: 123456
+            Email: ti01@oliveira.com.br<br />
+            Senha: Xinxuan99
           </div>
         </CardContent>
       </Card>
