@@ -9,8 +9,14 @@ WORKDIR /app
 # Copiar apenas os arquivos de dependência primeiro
 COPY package*.json ./
 
-# Instalar dependências com mais verbosidade e sem audit
-RUN npm ci --verbose --no-audit --no-optional && npm cache clean --force
+# Mostrar conteúdo dos arquivos para debug
+RUN echo "Conteúdo do package.json:" && cat package.json
+RUN echo "Node version:" && node -v
+RUN echo "NPM version:" && npm -v
+
+# Instalar dependências com mais verbosidade
+RUN npm install --verbose --legacy-peer-deps && \
+    npm cache clean --force
 
 # Copiar o resto dos arquivos do projeto
 COPY . .
@@ -19,7 +25,7 @@ COPY . .
 RUN echo "VITE_API_URL=http://backend:3000/api" > .env
 
 # Build da aplicação
-RUN npm run build || (echo "Build failed" && npm run build --verbose && exit 1)
+RUN npm run build
 
 # Production stage
 FROM nginx:alpine
