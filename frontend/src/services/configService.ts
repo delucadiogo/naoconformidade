@@ -19,7 +19,8 @@ class ConfigService {
     const token = getAuthToken();
     return {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     };
   }
@@ -31,7 +32,8 @@ class ConfigService {
   }
 
   static async createProductType(data: ConfigInput): Promise<ConfigType> {
-    const response = await api.post('/api/config/product-types', data, this.getHeaders());
+    console.log('Enviando dados para criar tipo de produto:', data);
+    const response = await api.post('/api/config/product-types', JSON.stringify(data), this.getHeaders());
     return response.data;
   }
 
@@ -46,7 +48,8 @@ class ConfigService {
   }
 
   static async createActionType(data: ConfigInput): Promise<ConfigType> {
-    const response = await api.post('/api/config/action-types', data, this.getHeaders());
+    console.log('Enviando dados para criar tipo de ação:', data);
+    const response = await api.post('/api/config/action-types', JSON.stringify(data), this.getHeaders());
     return response.data;
   }
 
