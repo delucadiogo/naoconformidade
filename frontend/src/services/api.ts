@@ -101,7 +101,7 @@ export const authService = {
   login: async (email: string, senha: string) => {
     try {
       console.log('Iniciando requisição de login:', { email });
-      const response = await api.post('/api/usuarios/login', { email, senha });
+      const response = await api.post('/api/auth/login', { email, senha });
       console.log('Resposta do login:', response.data);
       return response.data;
     } catch (error) {
