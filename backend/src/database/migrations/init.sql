@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS nao_conformidades (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Inserir usuário admin inicial
+-- Inserir usuário admin inicial (senha: Xinxuan99)
 INSERT INTO usuarios (nome, email, senha) 
-VALUES ('TI01', 'ti01@oliveira.com.br', '$2b$10$YourHashHere') 
+VALUES ('TI01', 'ti01@oliveira.com.br', '$2b$10$3NxM9U0YXsUBe3nVxGBvwONKH9Qw8K3q7h5PxA6.LuaU8WVXQXrHO') 
 ON CONFLICT (email) DO NOTHING; 
