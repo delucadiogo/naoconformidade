@@ -7,13 +7,13 @@ const pool = require('../config/database');
  */
 const mapUserToFrontend = (user) => ({
   id: user.id,
-  nome: user.nome,
+  name: user.nome,
   email: user.email,
-  funcao: user.funcao,
-  departamento: user.departamento,
-  ativo: user.ativo,
-  criado_em: user.criado_em,
-  atualizado_em: user.atualizado_em
+  role: user.funcao,
+  department: user.departamento,
+  isActive: user.ativo,
+  createdAt: user.criado_em,
+  updatedAt: user.atualizado_em
 });
 
 /**
@@ -61,7 +61,7 @@ const usuarioController = {
    * Cria um novo usuário
    */
   async criar(req, res) {
-    const { nome, email, senha, funcao, departamento } = req.body;
+    const { name: nome, email, password: senha, role: funcao, department: departamento } = req.body;
 
     try {
       // Verifica se o usuário já existe
@@ -96,15 +96,7 @@ const usuarioController = {
    */
   async atualizar(req, res) {
     const { id } = req.params;
-    // Mapeia os campos do frontend para o formato do backend
-    const { 
-      name: nome, 
-      email, 
-      password: senha, 
-      role: funcao, 
-      department: departamento, 
-      isActive: ativo 
-    } = req.body;
+    const { name, email, password, role, department, isActive } = req.body;
 
     try {
       // Verifica se o usuário existe antes de tentar atualizar
@@ -118,13 +110,13 @@ const usuarioController = {
       }
 
       let query = 'UPDATE usuarios SET nome = $1, email = $2, funcao = $3, departamento = $4, ativo = $5';
-      let params = [nome, email, funcao, departamento, ativo];
+      let params = [name, email, role, department, isActive];
       let paramCount = 5;
 
       // Se uma nova senha foi fornecida, atualiza a senha
-      if (senha) {
+      if (password) {
         const salt = await bcrypt.genSalt(10);
-        const senhaHash = await bcrypt.hash(senha, salt);
+        const senhaHash = await bcrypt.hash(password, salt);
         query += `, senha_hash = $${paramCount + 1}`;
         params.push(senhaHash);
         paramCount++;
@@ -199,43 +191,40 @@ const usuarioController = {
         return res.status(401).json({ mensagem: 'Credenciais inválidas' });
       }
 
-      console.log('Verificando senha...');
-      console.log('Senha fornecida:', senha);
-      console.log('Hash armazenado:', usuario.senha_hash);
-      
       // Verifica a senha
       const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
-      console.log('Senha válida:', senhaValida ? 'Sim' : 'Não');
+      console.log('Senha válida:', senhaValida);
 
       if (!senhaValida) {
         console.log('Senha inválida');
         return res.status(401).json({ mensagem: 'Credenciais inválidas' });
       }
 
-      console.log('Gerando token JWT...');
       // Gera o token JWT
       const token = jwt.sign(
         { 
           id: usuario.id, 
           email: usuario.email,
-          funcao: usuario.funcao 
+          funcao: usuario.funcao
         },
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
       );
 
-      console.log('Login realizado com sucesso');
+      // Retorna os dados do usuário e o token
       res.json({
         token,
-        usuario: mapUserToFrontend(usuario)
+        user: {
+          id: usuario.id,
+          name: usuario.nome,
+          email: usuario.email,
+          role: usuario.funcao,
+          department: usuario.departamento
+        }
       });
     } catch (error) {
-      console.error('Erro detalhado ao realizar login:', error);
-      console.error('Stack trace:', error.stack);
-      res.status(500).json({ 
-        mensagem: 'Erro ao realizar login',
-        erro: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
+      console.error('Erro ao realizar login:', error);
+      res.status(500).json({ mensagem: 'Erro ao realizar login' });
     }
   }
 };
