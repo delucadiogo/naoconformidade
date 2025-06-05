@@ -40,7 +40,7 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
 
   const getImageUrl = (filename: string) => {
     // URL base do backend
-    const baseUrl = 'http://192.168.2.175:3001';
+    const baseUrl = 'http://192.168.2.175:3000';
     return `${baseUrl}/uploads/${filename}`;
   };
 

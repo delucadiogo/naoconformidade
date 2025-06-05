@@ -17,7 +17,7 @@ RUN npm install --legacy-peer-deps --verbose
 COPY . .
 
 # Criar arquivo .env
-RUN echo "VITE_API_URL=http://backend:3001/api" > .env
+RUN echo "VITE_API_URL=http://backend:3000/api" > .env
 
 # Mostrar conteúdo do diretório e ambiente para debug
 RUN ls -la
