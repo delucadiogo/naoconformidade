@@ -4,6 +4,15 @@ const { authRouter, usuarioRouter } = require('./usuarioRoutes');
 const naoConformidadeRoutes = require('./naoConformidadeRoutes');
 const configRoutes = require('./configRoutes');
 
+// Health check
+router.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // Rotas de autenticação
 router.use('/auth', authRouter);
 
