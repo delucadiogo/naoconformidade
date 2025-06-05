@@ -47,6 +47,9 @@ class ConfigModel {
       return rows[0];
     } catch (error) {
       console.error('Erro em createProductType:', error);
+      if (error.code === '23505') { // Código de erro do PostgreSQL para violação de unique
+        throw new Error('Já existe um tipo de produto com este nome');
+      }
       throw error;
     }
   }
@@ -112,6 +115,9 @@ class ConfigModel {
       return rows[0];
     } catch (error) {
       console.error('Erro em createActionType:', error);
+      if (error.code === '23505') { // Código de erro do PostgreSQL para violação de unique
+        throw new Error('Já existe um tipo de ação com este nome');
+      }
       throw error;
     }
   }
