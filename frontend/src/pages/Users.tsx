@@ -41,12 +41,21 @@ const Users = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Mapeia os campos do formulário para o padrão do backend
+    const userPayload = {
+      name: formData.nome,
+      email: formData.email,
+      password: formData.senha || undefined,
+      role: formData.funcao,
+      department: formData.departamento,
+      isActive: formData.ativo
+    };
     try {
       if (editingUser) {
-        await updateUser(editingUser, formData);
+        await updateUser(editingUser, userPayload);
         toast.success('Usuário atualizado com sucesso!');
       } else {
-        await addUser(formData);
+        await addUser(userPayload);
         toast.success('Usuário criado com sucesso!');
       }
       setIsDialogOpen(false);
