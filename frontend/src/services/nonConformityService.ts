@@ -39,12 +39,12 @@ export interface UpdateNonConformityDTO {
 
 export const nonConformityService = {
   getAll: async (): Promise<NonConformity[]> => {
-    const response = await api.get('/nao-conformidades');
+    const response = await api.get('/api/nao-conformidades');
     return response.data;
   },
 
   getById: async (id: string): Promise<NonConformity> => {
-    const response = await api.get(`/nao-conformidades/${id}`);
+    const response = await api.get(`/api/nao-conformidades/${id}`);
     return response.data;
   },
 
@@ -62,7 +62,7 @@ export const nonConformityService = {
       });
     }
 
-    const response = await api.post('/nao-conformidades', formData, {
+    const response = await api.post('/api/nao-conformidades', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -84,7 +84,7 @@ export const nonConformityService = {
       });
     }
 
-    const response = await api.put(`/nao-conformidades/${id}`, formData, {
+    const response = await api.put(`/api/nao-conformidades/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -93,6 +93,6 @@ export const nonConformityService = {
   },
 
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/nao-conformidades/${id}`);
+    await api.delete(`/api/nao-conformidades/${id}`);
   },
 }; 
