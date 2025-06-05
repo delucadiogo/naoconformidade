@@ -59,7 +59,7 @@ const naoConformidadeController = {
       const resultado = await pool.query(
         `INSERT INTO nao_conformidades 
         (data_lancamento, nome_produto, validade, lote, tipo_produto, descricao, 
-         fotos, data_liberacao, acao_tomada, criado_por)
+         fotos, data_liberacao, acao_tomada, criado_por_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *`,
         [
@@ -96,7 +96,7 @@ const naoConformidadeController = {
       const resultado = await pool.query(
         `SELECT nc.*, u.nome as criado_por_nome 
          FROM nao_conformidades nc 
-         JOIN usuarios u ON nc.criado_por = u.id 
+         JOIN usuarios u ON nc.criado_por_id = u.id 
          ORDER BY nc.criado_em DESC`
       );
       res.json(resultado.rows);
@@ -116,7 +116,7 @@ const naoConformidadeController = {
       const resultado = await pool.query(
         `SELECT nc.*, u.nome as criado_por_nome 
          FROM nao_conformidades nc 
-         JOIN usuarios u ON nc.criado_por = u.id 
+         JOIN usuarios u ON nc.criado_por_id = u.id 
          WHERE nc.id = $1`,
         [id]
       );
