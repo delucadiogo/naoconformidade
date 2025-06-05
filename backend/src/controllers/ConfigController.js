@@ -14,18 +14,30 @@ class ConfigController {
 
   static async createProductType(req, res) {
     try {
+      console.log('Dados recebidos para criar tipo de produto:', req.body);
       const { label, value } = req.body;
+      
       if (!label || !value) {
+        console.log('Campos obrigatórios faltando:', { label, value });
         return res.status(400).json({ error: 'Rótulo e valor são obrigatórios' });
       }
+
+      console.log('Tentando criar tipo de produto:', { label, value });
       const newType = await ConfigModel.createProductType({ label, value });
+      console.log('Tipo de produto criado com sucesso:', newType);
+      
       res.status(201).json(newType);
     } catch (error) {
-      console.error('Erro ao criar tipo de produto:', error);
+      console.error('Erro detalhado ao criar tipo de produto:', error);
+      console.error('Stack trace:', error.stack);
+      
       if (error.code === '23505') { // Código de erro do PostgreSQL para violação de unique
         res.status(400).json({ error: 'Valor já existe' });
       } else {
-        res.status(500).json({ error: 'Erro interno do servidor' });
+        res.status(500).json({ 
+          error: 'Erro interno do servidor',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
       }
     }
   }
@@ -57,18 +69,30 @@ class ConfigController {
 
   static async createActionType(req, res) {
     try {
+      console.log('Dados recebidos para criar tipo de ação:', req.body);
       const { label, value } = req.body;
+      
       if (!label || !value) {
+        console.log('Campos obrigatórios faltando:', { label, value });
         return res.status(400).json({ error: 'Rótulo e valor são obrigatórios' });
       }
+
+      console.log('Tentando criar tipo de ação:', { label, value });
       const newType = await ConfigModel.createActionType({ label, value });
+      console.log('Tipo de ação criado com sucesso:', newType);
+      
       res.status(201).json(newType);
     } catch (error) {
-      console.error('Erro ao criar tipo de ação:', error);
+      console.error('Erro detalhado ao criar tipo de ação:', error);
+      console.error('Stack trace:', error.stack);
+      
       if (error.code === '23505') { // Código de erro do PostgreSQL para violação de unique
         res.status(400).json({ error: 'Valor já existe' });
       } else {
-        res.status(500).json({ error: 'Erro interno do servidor' });
+        res.status(500).json({ 
+          error: 'Erro interno do servidor',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
       }
     }
   }
