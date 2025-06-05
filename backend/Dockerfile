@@ -1,14 +1,18 @@
 # Build stage
 FROM node:18-alpine
 
+# Adicionar dependências necessárias
+RUN apk add --no-cache python3 make g++
+
 # Criar diretório da aplicação
 WORKDIR /app
 
 # Copiar arquivos de dependências
 COPY package*.json ./
 
-# Instalar dependências
-RUN npm install
+# Instalar dependências com flags para maior compatibilidade
+RUN npm install --verbose --legacy-peer-deps --no-optional && \
+    npm cache clean --force
 
 # Copiar código fonte
 COPY . .
