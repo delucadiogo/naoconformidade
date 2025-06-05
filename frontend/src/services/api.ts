@@ -9,6 +9,16 @@ export const api = axios.create({
   },
 });
 
+// Função para configurar o token no axios
+const setAuthToken = (token: string) => {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+};
+
+// Função para remover o token do axios
+const removeAuthToken = () => {
+  delete api.defaults.headers.common['Authorization'];
+};
+
 // Interceptor para adicionar token em todas as requisições
 api.interceptors.request.use(
   (config) => {
@@ -47,6 +57,7 @@ api.interceptors.response.use(
       if (status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        removeAuthToken();
         window.dispatchEvent(new Event('auth:logout'));
       }
     } else if (error.request) {
@@ -84,6 +95,12 @@ export const authService = {
       console.error('Erro detalhado no login:', error);
       throw error;
     }
+  },
+  setToken: (token: string) => {
+    setAuthToken(token);
+  },
+  removeToken: () => {
+    removeAuthToken();
   }
 };
 

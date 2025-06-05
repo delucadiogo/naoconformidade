@@ -28,6 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
+        // Configurar o token no axios
+        authService.setToken(token);
       } catch (error) {
         console.error('Erro ao parsear usuário salvo:', error);
         localStorage.removeItem('token');
@@ -59,6 +61,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(usuario));
       
+      // Configurar o token no axios
+      authService.setToken(token);
+      
       toast.success('Login realizado com sucesso!');
       return true;
     } catch (error) {
@@ -72,6 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Remover o token do axios
+    authService.removeToken();
     navigate('/');
     toast.info('Logout realizado com sucesso!');
   };
