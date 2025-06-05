@@ -54,12 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Tentando fazer login com:', { email });
       const response = await authService.login(email, senha);
-      const { token, usuario } = response;
+      const { token, user } = response;
       
-      console.log('Dados do usuário recebidos:', usuario);
-      setUser(usuario);
+      console.log('Dados do usuário recebidos:', user);
+      setUser(user);
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(usuario));
+      localStorage.setItem('user', JSON.stringify(user));
       
       // Configurar o token no axios
       authService.setToken(token);
