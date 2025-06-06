@@ -36,7 +36,7 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
   onDelete: handleDelete,
 }) => {
   const { user } = useAuth();
-  const { productTypes, actionTypes } = useConfig();
+  const { productTypes, actionTypes, loading } = useConfig();
   const [selectedNonConformity, setSelectedNonConformity] = useState<NonConformity | null>(null);
 
   const formatDate = (dateString: string | null) => {
@@ -50,11 +50,13 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
   };
 
   const getProductTypeLabel = (value: string) => {
+    if (!productTypes || loading) return value;
     const type = productTypes.find(t => t.value === value);
     return type ? type.label : value;
   };
 
   const getActionTypeLabel = (value: string) => {
+    if (!actionTypes || loading) return value;
     const type = actionTypes.find(t => t.value === value);
     return type ? type.label : value;
   };
@@ -62,6 +64,10 @@ const NonConformityTable: React.FC<NonConformityTableProps> = ({
   const handleView = (nc: NonConformity) => {
     setSelectedNonConformity(nc);
   };
+
+  if (loading) {
+    return <div className="text-center py-4">Carregando...</div>;
+  }
 
   return (
     <>
