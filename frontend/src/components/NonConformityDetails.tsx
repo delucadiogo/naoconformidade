@@ -31,7 +31,7 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
   onClose,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { productTypes, actionTypes } = useConfig();
+  const { productTypes, actions, loading } = useConfig();
 
   const formatDate = (date: string) => {
     if (!date) return '';
@@ -45,14 +45,29 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
   };
 
   const getProductTypeLabel = (value: string) => {
+    if (!productTypes || loading) return value;
     const type = productTypes.find(t => t.value === value);
     return type ? type.label : value;
   };
 
   const getActionTypeLabel = (value: string) => {
-    const type = actionTypes.find(t => t.value === value);
+    if (!actions || loading) return value;
+    const type = actions.find(t => t.value === value);
     return type ? type.label : value;
   };
+
+  if (loading) {
+    return (
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Não Conformidade</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-4">Carregando...</div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <>
