@@ -22,6 +22,7 @@ interface NonConformityDetailsProps {
     criado_por_nome?: string;
     descricao?: string;
     fotos?: string[];
+    situacao?: string;
   };
   onClose: () => void;
 }
@@ -31,7 +32,7 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
   onClose,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { productTypes, actions, loading } = useConfig();
+  const { productTypes, actions, situationTypes, loading } = useConfig();
 
   const formatDate = (date: string) => {
     if (!date) return '';
@@ -53,6 +54,12 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
   const getActionTypeLabel = (value: string) => {
     if (!actions || loading) return value;
     const type = actions.find(t => t.value === value);
+    return type ? type.label : value;
+  };
+
+  const getSituationLabel = (value: string | undefined) => {
+    if (!value || !situationTypes || loading) return value || 'Não definida';
+    const type = situationTypes.find(t => t.value === value);
     return type ? type.label : value;
   };
 
@@ -106,6 +113,11 @@ const NonConformityDetails: React.FC<NonConformityDetailsProps> = ({
             <div>
               <h4 className="font-semibold">Ação Tomada</h4>
               <p>{nonConformity.acao_tomada ? getActionTypeLabel(nonConformity.acao_tomada) : 'Não definida'}</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold">Situação</h4>
+              <p>{getSituationLabel(nonConformity.situacao)}</p>
             </div>
 
             <div>
