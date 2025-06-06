@@ -27,6 +27,11 @@ const Reports = () => {
 
   const isLoading = isLoadingNonConformities || isLoadingConfig;
 
+  const safeNonConformities = Array.isArray(nonConformities) ? nonConformities : [];
+  const safeProductTypes = Array.isArray(productTypes) ? productTypes : [];
+  const safeActions = Array.isArray(actions) ? actions : [];
+  const safeSituationTypes = Array.isArray(situationTypes) ? situationTypes : [];
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     try {
@@ -38,25 +43,22 @@ const Reports = () => {
   };
 
   const getProductTypeLabel = (value: string) => {
-    if (!productTypes) return value;
-    const type = productTypes.find(t => t.value === value);
+    const type = safeProductTypes.find(t => t.value === value);
     return type ? type.label : value;
   };
 
   const getActionTypeLabel = (value: string) => {
-    if (!actions) return value;
-    const type = actions.find(t => t.value === value);
+    const type = safeActions.find(t => t.value === value);
     return type ? type.label : value;
   };
 
   const getSituationLabel = (value: string | undefined) => {
-    if (!value || !situationTypes) return value || 'Não definida';
-    const type = situationTypes.find(t => t.value === value);
+    if (!value) return value || 'Não definida';
+    const type = safeSituationTypes.find(t => t.value === value);
     return type ? type.label : value;
   };
 
-  // Filtrar não conformidades baseado nos filtros
-  const filteredNonConformities = nonConformities.filter(nc => {
+  const filteredNonConformities = safeNonConformities.filter(nc => {
     let include = true;
     
     if (dateFrom && new Date(nc.data_lancamento) < new Date(dateFrom)) {
@@ -78,16 +80,15 @@ const Reports = () => {
     return include;
   });
 
-  // Dados para gráficos
-  const productTypeData = productTypes && !isLoading ? productTypes.map(type => ({
+  const productTypeData = safeProductTypes.map(type => ({
     name: type.label,
     value: filteredNonConformities.filter(nc => nc.tipo_produto === type.value).length
-  })).filter(item => item.value > 0) : [];
+  })).filter(item => item.value > 0);
 
-  const actionTypeData = actions && !isLoading ? actions.map(type => ({
+  const actionTypeData = safeActions.map(type => ({
     name: type.label,
     value: filteredNonConformities.filter(nc => nc.acao_tomada === type.value).length
-  })).filter(item => item.value > 0) : [];
+  })).filter(item => item.value > 0);
 
   const monthlyData = filteredNonConformities.reduce((acc, nc) => {
     const month = new Date(nc.data_lancamento).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
@@ -95,7 +96,7 @@ const Reports = () => {
     return acc;
   }, {});
 
-  const monthlyChartData = Object.entries(monthlyData).map(([month, count]) => ({
+  const monthlyChartData = Object.entries(monthlyData || {}).map(([month, count]) => ({
     month,
     count
   }));
@@ -194,7 +195,7 @@ const Reports = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos</SelectItem>
-                      {productTypes && productTypes.map(type => (
+                      {safeProductTypes.map(type => (
                         <SelectItem key={type.id} value={type.value}>
                           {type.label}
                         </SelectItem>
@@ -317,6 +318,11 @@ const Reports = () => {
                           </TableCell>
                         </TableRow>
                       ))}
+                      {!isLoading && filteredNonConformities.length === 0 && (
+                          <TableRow>
+                              <TableCell colSpan={9} className="text-center">Nenhum resultado encontrado.</TableCell>
+                          </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -413,7 +419,7 @@ const Reports = () => {
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="count" fill="#8884d8" name="Não Conformidades" />
+                          {monthlyChartData.length > 0 && <Bar dataKey="count" fill="#8884d8" name="Não Conformidades" />}
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
