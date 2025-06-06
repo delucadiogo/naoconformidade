@@ -96,182 +96,185 @@ const Settings = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold mb-6">Configurações</h1>
+    <>
+      <Header />
+      <div className="container mx-auto p-6 space-y-6">
+        <h1 className="text-2xl font-bold mb-6">Configurações</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Tipos de Produto */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tipos de Produto</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddProductType} className="space-y-4 mb-6">
-              <div className="space-y-2">
-                <Label htmlFor="productLabel">Rótulo</Label>
-                <Input
-                  id="productLabel"
-                  value={newProductLabel}
-                  onChange={(e) => setNewProductLabel(e.target.value)}
-                  placeholder="Digite o rótulo"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="productValue">Valor</Label>
-                <Input
-                  id="productValue"
-                  value={newProductValue}
-                  onChange={(e) => setNewProductValue(e.target.value)}
-                  placeholder="Digite o valor"
-                  required
-                />
-              </div>
-              <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Plus className="h-4 w-4 mr-2" />
-                )}
-                Adicionar Tipo
-              </Button>
-            </form>
-
-            <div className="space-y-2">
-              {productTypes.map((type) => (
-                <div key={type.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <div>
-                    <p className="font-medium">{type.label}</p>
-                    <p className="text-sm text-gray-500">{type.value}</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeProductType(type.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Tipos de Produto */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tipos de Produto</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAddProductType} className="space-y-4 mb-6">
+                <div className="space-y-2">
+                  <Label htmlFor="productLabel">Rótulo</Label>
+                  <Input
+                    id="productLabel"
+                    value={newProductLabel}
+                    onChange={(e) => setNewProductLabel(e.target.value)}
+                    placeholder="Digite o rótulo"
+                    required
+                  />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tipos de Situação */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tipos de Situação</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddSituationType} className="space-y-4 mb-6">
-              <div className="space-y-2">
-                <Label htmlFor="situationLabel">Rótulo</Label>
-                <Input
-                  id="situationLabel"
-                  value={newSituationLabel}
-                  onChange={(e) => setNewSituationLabel(e.target.value)}
-                  placeholder="Digite o rótulo"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="situationValue">Valor</Label>
-                <Input
-                  id="situationValue"
-                  value={newSituationValue}
-                  onChange={(e) => setNewSituationValue(e.target.value)}
-                  placeholder="Digite o valor"
-                  required
-                />
-              </div>
-              <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Plus className="h-4 w-4 mr-2" />
-                )}
-                Adicionar Tipo
-              </Button>
-            </form>
-
-            <div className="space-y-2">
-              {situationTypes.map((type) => (
-                <div key={type.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <div>
-                    <p className="font-medium">{type.label}</p>
-                    <p className="text-sm text-gray-500">{type.value}</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeSituationType(type.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="productValue">Valor</Label>
+                  <Input
+                    id="productValue"
+                    value={newProductValue}
+                    onChange={(e) => setNewProductValue(e.target.value)}
+                    placeholder="Digite o valor"
+                    required
+                  />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Plus className="h-4 w-4 mr-2" />
+                  )}
+                  Adicionar Tipo
+                </Button>
+              </form>
 
-        {/* Ações */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ações</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddAction} className="space-y-4 mb-6">
               <div className="space-y-2">
-                <Label htmlFor="actionLabel">Rótulo</Label>
-                <Input
-                  id="actionLabel"
-                  value={newActionLabel}
-                  onChange={(e) => setNewActionLabel(e.target.value)}
-                  placeholder="Digite o rótulo"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="actionValue">Valor</Label>
-                <Input
-                  id="actionValue"
-                  value={newActionValue}
-                  onChange={(e) => setNewActionValue(e.target.value)}
-                  placeholder="Digite o valor"
-                  required
-                />
-              </div>
-              <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Plus className="h-4 w-4 mr-2" />
-                )}
-                Adicionar Ação
-              </Button>
-            </form>
-
-            <div className="space-y-2">
-              {actions.map((action) => (
-                <div key={action.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <div>
-                    <p className="font-medium">{action.label}</p>
-                    <p className="text-sm text-gray-500">{action.value}</p>
+                {productTypes.map((type) => (
+                  <div key={type.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div>
+                      <p className="font-medium">{type.label}</p>
+                      <p className="text-sm text-gray-500">{type.value}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeProductType(type.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeAction(action.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tipos de Situação */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tipos de Situação</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAddSituationType} className="space-y-4 mb-6">
+                <div className="space-y-2">
+                  <Label htmlFor="situationLabel">Rótulo</Label>
+                  <Input
+                    id="situationLabel"
+                    value={newSituationLabel}
+                    onChange={(e) => setNewSituationLabel(e.target.value)}
+                    placeholder="Digite o rótulo"
+                    required
+                  />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="situationValue">Valor</Label>
+                  <Input
+                    id="situationValue"
+                    value={newSituationValue}
+                    onChange={(e) => setNewSituationValue(e.target.value)}
+                    placeholder="Digite o valor"
+                    required
+                  />
+                </div>
+                <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Plus className="h-4 w-4 mr-2" />
+                  )}
+                  Adicionar Tipo
+                </Button>
+              </form>
+
+              <div className="space-y-2">
+                {situationTypes.map((type) => (
+                  <div key={type.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div>
+                      <p className="font-medium">{type.label}</p>
+                      <p className="text-sm text-gray-500">{type.value}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeSituationType(type.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Ações */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Ações</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAddAction} className="space-y-4 mb-6">
+                <div className="space-y-2">
+                  <Label htmlFor="actionLabel">Rótulo</Label>
+                  <Input
+                    id="actionLabel"
+                    value={newActionLabel}
+                    onChange={(e) => setNewActionLabel(e.target.value)}
+                    placeholder="Digite o rótulo"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="actionValue">Valor</Label>
+                  <Input
+                    id="actionValue"
+                    value={newActionValue}
+                    onChange={(e) => setNewActionValue(e.target.value)}
+                    placeholder="Digite o valor"
+                    required
+                  />
+                </div>
+                <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Plus className="h-4 w-4 mr-2" />
+                  )}
+                  Adicionar Ação
+                </Button>
+              </form>
+
+              <div className="space-y-2">
+                {actions.map((action) => (
+                  <div key={action.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div>
+                      <p className="font-medium">{action.label}</p>
+                      <p className="text-sm text-gray-500">{action.value}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeAction(action.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
