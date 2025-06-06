@@ -13,6 +13,8 @@ export interface NonConformity {
   data_liberacao?: string;
   acao_tomada: string;
   acao_tomada_rotulo?: string;
+  situacao: string;
+  situacao_rotulo?: string;
   criado_em: string;
   criado_por_nome?: string;
 }

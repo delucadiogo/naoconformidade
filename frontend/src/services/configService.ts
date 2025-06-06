@@ -41,20 +41,36 @@ class ConfigService {
     await api.delete(`/api/config/product-types/${id}`, this.getHeaders());
   }
 
-  // Tipos de Ação
-  static async getAllActionTypes(): Promise<ConfigType[]> {
-    const response = await api.get('/api/config/action-types', this.getHeaders());
+  // Tipos de Situação (antigo Tipos de Ação)
+  static async getAllSituationTypes(): Promise<ConfigType[]> {
+    const response = await api.get('/api/config/situation-types', this.getHeaders());
     return response.data;
   }
 
-  static async createActionType(data: ConfigInput): Promise<ConfigType> {
-    console.log('Enviando dados para criar tipo de ação:', data);
-    const response = await api.post('/api/config/action-types', data, this.getHeaders());
+  static async createSituationType(data: ConfigInput): Promise<ConfigType> {
+    console.log('Enviando dados para criar tipo de situação:', data);
+    const response = await api.post('/api/config/situation-types', data, this.getHeaders());
     return response.data;
   }
 
-  static async deleteActionType(id: number): Promise<void> {
-    await api.delete(`/api/config/action-types/${id}`, this.getHeaders());
+  static async deleteSituationType(id: number): Promise<void> {
+    await api.delete(`/api/config/situation-types/${id}`, this.getHeaders());
+  }
+
+  // Ações
+  static async getAllActions(): Promise<ConfigType[]> {
+    const response = await api.get('/api/config/actions', this.getHeaders());
+    return response.data;
+  }
+
+  static async createAction(data: ConfigInput): Promise<ConfigType> {
+    console.log('Enviando dados para criar ação:', data);
+    const response = await api.post('/api/config/actions', data, this.getHeaders());
+    return response.data;
+  }
+
+  static async deleteAction(id: number): Promise<void> {
+    await api.delete(`/api/config/actions/${id}`, this.getHeaders());
   }
 }
 

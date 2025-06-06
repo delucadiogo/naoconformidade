@@ -56,7 +56,7 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const { addNonConformity, updateNonConformity, getNonConformity } = useNonConformity();
-  const { productTypes, actionTypes, loading } = useConfig();
+  const { productTypes, situationTypes, actions, loading } = useConfig();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
 
@@ -232,6 +232,31 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
 
             <FormField
               control={form.control}
+              name="situacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Situação</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a situação" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {situationTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="acao_tomada"
               render={({ field }) => (
                 <FormItem>
@@ -243,9 +268,9 @@ const NonConformityForm: React.FC<NonConformityFormProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {actionTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
+                      {actions.map((action) => (
+                        <SelectItem key={action.value} value={action.value}>
+                          {action.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

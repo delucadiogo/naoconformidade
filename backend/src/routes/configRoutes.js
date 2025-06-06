@@ -11,9 +11,14 @@ router.get('/product-types', ConfigController.getAllProductTypes);
 router.post('/product-types', ConfigController.createProductType);
 router.delete('/product-types/:id', ConfigController.deleteProductType);
 
-// Rotas para tipos de ação
-router.get('/action-types', ConfigController.getAllActionTypes);
-router.post('/action-types', ConfigController.createActionType);
-router.delete('/action-types/:id', ConfigController.deleteActionType);
+// Rotas para tipos de situação (antigo tipos de ação)
+router.get('/situation-types', ConfigController.getAllSituationTypes);
+router.post('/situation-types', ConfigController.createSituationType);
+router.delete('/situation-types/:id', ConfigController.deleteSituationType);
+
+// Rotas para ações
+router.get('/actions', ConfigController.getAllActions);
+router.post('/actions', ConfigController.createAction);
+router.delete('/actions/:id', ConfigController.deleteAction);
 
 module.exports = router; 

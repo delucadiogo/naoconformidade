@@ -5,15 +5,18 @@ import { useAuth } from './AuthContext';
 
 interface ConfigContextData {
   productTypes: ConfigType[];
-  actionTypes: ConfigType[];
+  situationTypes: ConfigType[];
+  actions: ConfigType[];
   loading: boolean;
   addProductType: (data: ConfigInput) => Promise<void>;
   removeProductType: (id: number) => Promise<void>;
-  addActionType: (data: ConfigInput) => Promise<void>;
-  removeActionType: (id: number) => Promise<void>;
+  addSituationType: (data: ConfigInput) => Promise<void>;
+  removeSituationType: (id: number) => Promise<void>;
+  addAction: (data: ConfigInput) => Promise<void>;
+  removeAction: (id: number) => Promise<void>;
 }
 
-const ConfigContext = createContext<ConfigContextData>({} as ConfigContextData);
+export const ConfigContext = createContext<ConfigContextData>({} as ConfigContextData);
 
 export const useConfig = () => {
   const context = useContext(ConfigContext);
@@ -25,7 +28,8 @@ export const useConfig = () => {
 
 export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [productTypes, setProductTypes] = useState<ConfigType[]>([]);
-  const [actionTypes, setActionTypes] = useState<ConfigType[]>([]);
+  const [situationTypes, setSituationTypes] = useState<ConfigType[]>([]);
+  const [actions, setActions] = useState<ConfigType[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -40,12 +44,14 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const loadConfigs = async () => {
     try {
       setLoading(true);
-      const [productTypesData, actionTypesData] = await Promise.all([
+      const [productTypesData, situationTypesData, actionsData] = await Promise.all([
         ConfigService.getAllProductTypes(),
-        ConfigService.getAllActionTypes()
+        ConfigService.getAllSituationTypes(),
+        ConfigService.getAllActions()
       ]);
       setProductTypes(productTypesData);
-      setActionTypes(actionTypesData);
+      setSituationTypes(situationTypesData);
+      setActions(actionsData);
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
       toast.error('Erro ao carregar configurações');
@@ -78,26 +84,50 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
-  const addActionType = async (data: ConfigInput) => {
+  const addSituationType = async (data: ConfigInput) => {
     try {
-      const newType = await ConfigService.createActionType(data);
-      setActionTypes(prev => [...prev, newType]);
-      toast.success('Tipo de ação adicionado com sucesso!');
+      const newType = await ConfigService.createSituationType(data);
+      setSituationTypes(prev => [...prev, newType]);
+      toast.success('Tipo de situação adicionado com sucesso!');
     } catch (error) {
-      console.error('Erro ao adicionar tipo de ação:', error);
-      toast.error('Erro ao adicionar tipo de ação');
+      console.error('Erro ao adicionar tipo de situação:', error);
+      toast.error('Erro ao adicionar tipo de situação');
       throw error;
     }
   };
 
-  const removeActionType = async (id: number) => {
+  const removeSituationType = async (id: number) => {
     try {
-      await ConfigService.deleteActionType(id);
-      setActionTypes(prev => prev.filter(type => type.id !== id));
-      toast.success('Tipo de ação removido com sucesso!');
+      await ConfigService.deleteSituationType(id);
+      setSituationTypes(prev => prev.filter(type => type.id !== id));
+      toast.success('Tipo de situação removido com sucesso!');
     } catch (error) {
-      console.error('Erro ao remover tipo de ação:', error);
-      toast.error('Erro ao remover tipo de ação');
+      console.error('Erro ao remover tipo de situação:', error);
+      toast.error('Erro ao remover tipo de situação');
+      throw error;
+    }
+  };
+
+  const addAction = async (data: ConfigInput) => {
+    try {
+      const newAction = await ConfigService.createAction(data);
+      setActions(prev => [...prev, newAction]);
+      toast.success('Ação adicionada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao adicionar ação:', error);
+      toast.error('Erro ao adicionar ação');
+      throw error;
+    }
+  };
+
+  const removeAction = async (id: number) => {
+    try {
+      await ConfigService.deleteAction(id);
+      setActions(prev => prev.filter(action => action.id !== id));
+      toast.success('Ação removida com sucesso!');
+    } catch (error) {
+      console.error('Erro ao remover ação:', error);
+      toast.error('Erro ao remover ação');
       throw error;
     }
   };
@@ -106,12 +136,15 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     <ConfigContext.Provider
       value={{
         productTypes,
-        actionTypes,
+        situationTypes,
+        actions,
         loading,
         addProductType,
         removeProductType,
-        addActionType,
-        removeActionType
+        addSituationType,
+        removeSituationType,
+        addAction,
+        removeAction
       }}
     >
       {children}
